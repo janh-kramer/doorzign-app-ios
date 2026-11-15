@@ -248,3 +248,45 @@ final class RoutingStubTransport: ClientTransport, @unchecked Sendable {
         #expect(calendarJSON["view"] == nil)
     }
 }
+
+/// Edge-Web erlaubt längere Texte (title 120, headline 160, …) als der Vertrag (50/75/50/100).
+@Suite struct OverlongTextTests {
+    @Test func ueberlangeTexteAnnehmenUndBeimSpeichernHinweisen() async throws {
+        var fixture = try #require(contractFixture("slots.json") as? [String: Any])
+        var slots = try #require(fixture["data"] as? [[String: Any]])
+        let index = try #require(slots.firstIndex { ($0["content"] as? [String: Any])?["type"] as? String == "text" })
+        var content = try #require(slots[index]["content"] as? [String: Any])
+        content["title"] = String(repeating: "T", count: 120)
+        content["headline"] = String(repeating: "H", count: 160)
+        content["message"] = String(repeating: "M", count: 200)
+        slots[index]["content"] = content
+        fixture["data"] = slots
+        let response = fixture
+
+        let transport = RoutingStubTransport()
+        transport.on("listSlots") { _, _ in RoutingStubTransport.json(.ok, response) }
+        // Kein Decode-Fehler trotz Überschreitung von maxLength.
+        let decoded = try await transport.makeClient().listSlots(path: .init(displayId: "d-1")).ok.body.json.data
+        let slot = try #require(decoded.first { if case .text = $0.content { true } else { false } })
+        guard case .text(let text) = slot.content else { Issue.record("erwartet: Text"); return }
+        #expect(text.headline?.count == 160)
+
+        // Entwurf übernimmt die Texte vollständig, Speichern ist gesperrt mit konkretem Hinweis.
+        let draft = SlotDraft(slot.content)
+        #expect(draft.text.headline.count == 160)
+        #expect(draft.content == nil)
+        #expect(draft.text.tooLongFields.map { $0.name } == ["Titel", "Überschrift", "Nachricht"])
+        let reason = try #require(draft.incompleteReason)
+        #expect(reason.contains("Überschrift (160/75)"))
+    }
+
+    @Test func eingabebegrenzungSchneidetVorhandenesNichtAb() {
+        let long = String(repeating: "x", count: 160)
+        // Normales Tippen über das Limit wird abgeschnitten.
+        #expect(SlotDraft.Text.limitedInput("abcdef", previous: "abcde", limit: 5) == "abcde")
+        // Zu langer Bestand: ein weiteres Zeichen wird abgelehnt, nicht auf 75 gekürzt.
+        #expect(SlotDraft.Text.limitedInput(long + "y", previous: long, limit: 75) == long)
+        // Kürzen ist erlaubt.
+        #expect(SlotDraft.Text.limitedInput(String(long.dropLast(10)), previous: long, limit: 75).count == 150)
+    }
+}

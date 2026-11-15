@@ -41,6 +41,22 @@ public struct SlotDraft: Equatable, Sendable {
                 && subHeadline.count <= Self.limits.subHeadline && message.count <= Self.limits.message
         }
 
+        /// Felder über dem Vertragslimit (Edge-Web erlaubt längere Texte) mit Länge und Limit.
+        public var tooLongFields: [(name: String, count: Int, limit: Int)] {
+            [("Titel", title, Self.limits.title), ("Überschrift", headline, Self.limits.headline),
+             ("Unterüberschrift", subHeadline, Self.limits.subHeadline), ("Nachricht", message, Self.limits.message)]
+                .filter { $0.1.count > $0.2 }
+                .map { (name: $0.0, count: $0.1.count, limit: $0.2) }
+        }
+
+        /// Eingabe begrenzen: Wachsen über das Limit wird abgeschnitten; ein bereits zu langer Text
+        /// darf nur gekürzt oder gleich lang bearbeitet werden und wird nicht still abgeschnitten.
+        public static func limitedInput(_ new: String, previous: String, limit: Int) -> String {
+            if new.count <= limit { return new }
+            if previous.count <= limit { return String(new.prefix(limit)) }
+            return new.count <= previous.count ? new : previous
+        }
+
         /// Mindestens ein Feld enthält Text (außer Leerzeichen).
         public var hasText: Bool {
             [title, headline, subHeadline, message].contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
@@ -160,7 +176,11 @@ public struct SlotDraft: Equatable, Sendable {
     /// Hinweis, warum der Entwurf (noch) nicht gespeichert werden kann.
     public var incompleteReason: String? {
         switch kind {
-        case .text: text.isValid ? nil : "Ein Feld ist zu lang."
+        case .text:
+            text.isValid ? nil
+                : "Zu lang zum Speichern: "
+                    + text.tooLongFields.map { "\($0.name) (\($0.count)/\($0.limit))" }.joined(separator: ", ")
+                    + ". Bitte kürzen."
         case .image: image.mediaId == nil ? "Bitte ein Bild auswählen." : nil
         case .calendar:
             calendar.source == .zeitwart ? "Wird in Zeitwart konfiguriert."

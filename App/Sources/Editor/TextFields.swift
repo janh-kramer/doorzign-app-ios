@@ -1,7 +1,9 @@
 import DoorZignCore
 import SwiftUI
 
-/// Textfeld mit Zeichenzähler; Eingaben über dem Limit werden abgeschnitten.
+/// Textfeld mit Zeichenzähler. Neue Eingaben über dem Limit werden abgeschnitten.
+/// Bereits zu lange Texte (z. B. aus der Edge-Weboberfläche) bleiben unverändert stehen,
+/// bis sie gekürzt werden – nie stilles Abschneiden vorhandener Inhalte.
 struct CountedField: View {
     let title: String
     @Binding var text: String
@@ -15,16 +17,24 @@ struct CountedField: View {
         self.axis = axis
     }
 
+    private var isTooLong: Bool { text.count > limit }
+
     var body: some View {
         VStack(alignment: .trailing, spacing: 2) {
             TextField(title, text: Binding(
                 get: { text },
-                set: { text = String($0.prefix(limit)) }
+                set: { text = SlotDraft.Text.limitedInput($0, previous: text, limit: limit) }
             ), axis: axis)
             .lineLimit(axis == .vertical ? 2...4 : 1...1)
             Text("\(text.count)/\(limit)")
                 .font(.caption2.monospacedDigit())
-                .foregroundStyle(text.count >= limit ? Color.orange : Color.secondary)
+                .foregroundStyle(isTooLong ? Color.red : text.count == limit ? Color.orange : Color.secondary)
+            if isTooLong {
+                Text("Zu lang – bitte auf höchstens \(limit) Zeichen kürzen.")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
 }
