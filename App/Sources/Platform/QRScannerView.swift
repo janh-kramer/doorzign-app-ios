@@ -18,7 +18,7 @@ struct QRScannerSheet: View {
                         .overlay(alignment: .bottom) {
                             Text("Richte die Kamera auf den QR-Code.")
                                 .padding(12)
-                                .background(.regularMaterial, in: Capsule())
+                                .floatingGlass(in: Capsule())
                                 .padding(.bottom, 40)
                         }
                 case .notDetermined:

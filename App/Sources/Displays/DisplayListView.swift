@@ -35,7 +35,7 @@ struct DisplayListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) { filterMenu }
         }
-        .safeAreaInset(edge: .top) {
+        .topBar {
             if model.filter != .all {
                 FilterBanner(filter: model.filter) { model.filter = .all }
             }
@@ -93,7 +93,6 @@ private struct FilterBanner: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(.bar)
     }
 }
 

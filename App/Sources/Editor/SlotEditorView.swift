@@ -125,23 +125,25 @@ struct SlotEditorView: View {
         Section {
             ZStack {
                 RoundedRectangle(cornerRadius: 8).fill(Color.white)
-                if let png = model.previewPNG, let image = UIImage(data: png) {
+                // Nicht lesbare Antwort (z. B. Prism-Mock) zählt wie ein Fehler, sonst bliebe der Ladekreis stehen.
+                let image = model.previewPNG.flatMap(UIImage.init(data:))
+                if let image {
                     Image(uiImage: image).resizable().interpolation(.none).scaledToFit()
                         .opacity(model.isPreviewBlockedByLength ? 0.35 : 1)
                     if model.isPreviewBlockedByLength {
                         PreviewBlockedLabel()
                             .padding(8)
-                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                            .floatingGlass(in: RoundedRectangle(cornerRadius: 8))
                     }
                 } else if model.isPreviewBlockedByLength {
                     PreviewBlockedLabel()
-                } else if model.previewError == nil {
+                } else if model.previewError == nil && model.previewPNG == nil {
                     ProgressView()
                 } else {
                     Image(systemName: "eye.slash").foregroundStyle(.tertiary)
                 }
                 if model.isRenderingPreview && model.previewPNG != nil && !model.isPreviewBlockedByLength {
-                    ProgressView().padding(8).background(.regularMaterial, in: Circle())
+                    ProgressView().padding(8).floatingGlass(in: Circle())
                 }
             }
             .aspectRatio(4 / 3, contentMode: .fit)

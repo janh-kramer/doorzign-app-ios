@@ -84,7 +84,7 @@ struct DisplayDetailView: View {
                 Text(notice)
                     .font(.callout)
                     .padding(.horizontal, 16).padding(.vertical, 10)
-                    .background(.regularMaterial, in: Capsule())
+                    .floatingGlass(in: Capsule())
                     .padding(.bottom, 16)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .task {
