@@ -185,12 +185,12 @@
 "Titel" = "Title";
 "Typ" = "Type";
 "Ungültige Antwort der Anmeldung. Bitte erneut versuchen." = "Invalid sign-in response. Please try again.";
-"Unter diesem Namen erkennt dein Administrator das Gerät. Zum Abmelden einzelner Geräte wende dich an deinen Administrator." = "Your administrator can identify the device by this name. To sign out individual devices, contact your administrator.";
+"Unter diesem Namen erkennt dein Administrator das Gerät. Zum Abmelden einzelner Geräte wende dich an deinen Administrator." = "Your administrator uses this name to identify the device. To sign out individual devices, contact your administrator.";
 "Unter diesem Namen erscheint das Gerät in der Weboberfläche unter „Verbundene Geräte“." = "The device appears under this name in the web interface under “Connected devices”.";
 "Unterüberschrift" = "Subheadline";
 "Verbinden" = "Connect";
 "Verbindung trennen" = "Disconnect";
-"Verbindung über das Internet" = "Connection via the internet";
+"Verbindung über das Internet" = "Connection over the internet";
 "Verbunden mit" = "Connected to";
 "Vergleiche den Fingerprint mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt." = "Compare the fingerprint with the one shown in the Edge web interface under “Connect the DoorZign app”. Only connect if it matches.";
 "Version" = "Version";
@@ -198,7 +198,7 @@
 "Verwerfen" = "Discard";
 "Vollständig anzeigen" = "Show in full";
 "Vorschau" = "Preview";
-"Vorschau Ansicht %lld" = "Preview view %lld";
+"Vorschau Ansicht %lld" = "Preview of view %lld";
 "Wann" = "When";
 "Weiter" = "Continue";
 "Weitere Aktionen" = "More actions";
