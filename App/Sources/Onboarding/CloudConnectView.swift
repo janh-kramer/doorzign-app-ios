@@ -3,6 +3,10 @@ import SwiftUI
 
 /// Onboarding Cloud: Instanz eingeben (oder Verbindungs-QR-Code scannen, falls vorhanden).
 struct CloudConnectView: View {
+    /// Zeitwart bietet (noch) keinen Verbindungs-QR-Code (ui-spec, Koordination 2026-11-15): Knopf ausgeblendet.
+    /// Der Parser für `doorzign://cloud` bleibt aktiv (Deep Links). Zum Einschalten auf `true` setzen.
+    static let showsQRScanner = false
+
     @Environment(AppSession.self) private var session
     @Environment(OnboardingModel.self) private var model
     @State private var instance = ""
@@ -32,12 +36,13 @@ struct CloudConnectView: View {
 
             ErrorSection(message: model.errorMessage)
 
-            // Keine Zeitwart-Menünamen in App-Texten (Koordination 2026-11-15): Zeitwart bietet (noch) keinen QR-Code.
-            Section {
-                Button {
-                    showScanner = true
-                } label: {
-                    Label("QR-Code scannen", systemImage: "qrcode.viewfinder")
+            if Self.showsQRScanner {
+                Section {
+                    Button {
+                        showScanner = true
+                    } label: {
+                        Label("QR-Code scannen", systemImage: "qrcode.viewfinder")
+                    }
                 }
             }
         }
