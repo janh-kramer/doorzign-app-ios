@@ -32,7 +32,7 @@
 "Das System ist vorübergehend nicht verfügbar. Bitte gleich erneut versuchen." = "The system is temporarily unavailable. Please try again shortly.";
 "Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „DoorZign-App verbinden“ erneut scannen." = "The system's certificate does not match the QR code. Please scan the QR code again in the Edge web interface under “Connect the DoorZign app”.";
 "Deaktiviert" = "Deactivated";
-"Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an." = "Your session has expired. Please sign in again.";
+"Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an." = "Your sign-in has expired. Please sign in again.";
 "Der Kalender konnte nicht abgerufen werden." = "The calendar could not be retrieved.";
 "Der Zeitplan wurde inzwischen geändert. Die Liste wurde neu geladen." = "The schedule has been changed in the meantime. The list has been reloaded.";
 "Die Anmeldung beim Anbieter ist fehlgeschlagen." = "Sign-in with the provider failed.";
