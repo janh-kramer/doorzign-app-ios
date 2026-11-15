@@ -165,7 +165,7 @@ struct BatteryIndicator: View {
             Image(systemName: Self.symbol(percent))
         }
         .foregroundStyle(level == .critical ? Color.red : level == .low ? Color.orange : Color.secondary)
-        .accessibilityLabel("Akku \(percent.map { "\($0) Prozent" } ?? level.label)")
+        .accessibilityLabel("Akku \(percent.map { String(localized: "\($0) Prozent") } ?? level.label)")
     }
 
     static func symbol(_ percent: Int?) -> String {

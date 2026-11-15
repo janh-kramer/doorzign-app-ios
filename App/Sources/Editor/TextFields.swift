@@ -5,12 +5,12 @@ import SwiftUI
 /// Bereits zu lange Texte (z. B. aus der Edge-Weboberfläche) bleiben unverändert stehen,
 /// bis sie gekürzt werden – nie stilles Abschneiden vorhandener Inhalte.
 struct CountedField: View {
-    let title: String
+    let title: LocalizedStringKey
     @Binding var text: String
     let limit: Int
     var axis: Axis = .horizontal
 
-    init(_ title: String, text: Binding<String>, limit: Int, axis: Axis = .horizontal) {
+    init(_ title: LocalizedStringKey, text: Binding<String>, limit: Int, axis: Axis = .horizontal) {
         self.title = title
         self._text = text
         self.limit = limit
@@ -41,7 +41,7 @@ struct CountedField: View {
 
 /// Auswahl Schwarz/Weiß/Rot.
 struct ColorChoice: View {
-    let title: String
+    let title: LocalizedStringKey
     @Binding var selection: SlotColor
 
     var body: some View {

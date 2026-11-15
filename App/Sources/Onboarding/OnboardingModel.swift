@@ -42,7 +42,7 @@ final class OnboardingModel {
         do {
             await connect(link: try PairingLink.parse(scannedCode), session: session)
         } catch {
-            errorMessage = "Dieser QR-Code ist kein DoorZign-Verbindungscode. Bitte den Code aus „Mobile App verbinden“ (Edge) bzw. aus dem Zeitwart-Profil scannen."
+            errorMessage = String(localized: "Dieser QR-Code ist kein DoorZign-Verbindungscode. Bitte den Code aus „Mobile App verbinden“ (Edge) bzw. aus dem Zeitwart-Profil scannen.")
         }
     }
 
@@ -50,7 +50,7 @@ final class OnboardingModel {
 
     func connectEdge(address: String) async {
         guard let url = APIBase.edge(fromInput: address) else {
-            errorMessage = "Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:8443."
+            errorMessage = String(localized: "Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:8443.")
             return
         }
         await probeForTrust(url: url)
@@ -63,7 +63,7 @@ final class OnboardingModel {
             let url = try await GatewayBrowser.resolve(gateway)
             await probeForTrust(url: url)
         } catch {
-            errorMessage = "Das Gateway „\(gateway.displayName)“ konnte nicht erreicht werden."
+            errorMessage = String(localized: "Das Gateway „\(gateway.displayName)“ konnte nicht erreicht werden.")
         }
     }
 
@@ -73,7 +73,7 @@ final class OnboardingModel {
         do {
             let probe = try await SystemProbe.probe(urls: [url], trust: .captureForConfirmation)
             guard let fingerprint = probe.presentedFingerprint else {
-                errorMessage = "Das Gateway hat kein Zertifikat vorgelegt."
+                errorMessage = String(localized: "Das Gateway hat kein Zertifikat vorgelegt.")
                 return
             }
             pendingTrust = PendingTrust(probe: probe, fingerprint: fingerprint)
@@ -94,7 +94,7 @@ final class OnboardingModel {
 
     func connectCloud(input: String, session: AppSession) async {
         guard let url = APIBase.cloud(fromInput: input) else {
-            errorMessage = "Bitte den Namen der Instanz (z. B. „firma“) oder die vollständige Adresse eingeben."
+            errorMessage = String(localized: "Bitte den Namen der Instanz (z. B. „firma“) oder die vollständige Adresse eingeben.")
             return
         }
         await run {

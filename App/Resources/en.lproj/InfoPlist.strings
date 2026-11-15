@@ -1,0 +1,4 @@
+/* Info.plist – Englisch (Deutsch steht direkt in project.yml). */
+"NSCameraUsageDescription" = "The camera is used to scan the connection QR code and to take photos for the displays.";
+"NSPhotoLibraryUsageDescription" = "Photos from your library can be shown as an image on a display.";
+"NSLocalNetworkUsageDescription" = "DoorZign searches the local network for DoorZign Edge gateways and connects to them.";

@@ -99,7 +99,7 @@ private struct MediaThumbnail: View {
                 }
             }
             .accessibilityElement()
-            .accessibilityLabel(Text(media.fileName ?? "Bild"))
+            .accessibilityLabel(Text(media.fileName ?? String(localized: "Bild")))
             .accessibilityValue(Text("\(media.width) × \(media.height)"))
             .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             .task(id: media.id) {

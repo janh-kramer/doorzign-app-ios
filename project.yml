@@ -42,7 +42,7 @@ targets:
       properties:
         CFBundleDisplayName: DoorZign
         CFBundleDevelopmentRegion: de
-        CFBundleLocalizations: [de]
+        CFBundleLocalizations: [de, en]
         UILaunchScreen: {}
         UIApplicationSupportsIndirectInputEvents: true
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]

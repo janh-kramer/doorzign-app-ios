@@ -104,7 +104,7 @@ struct SchedulesView: View {
     }
 
     private func title(_ schedule: Schedule) -> String {
-        schedule.name.isEmpty ? "Ansicht \(schedule.slot)" : schedule.name
+        schedule.name.isEmpty ? String(localized: "Ansicht \(schedule.slot)") : schedule.name
     }
 
     @ViewBuilder

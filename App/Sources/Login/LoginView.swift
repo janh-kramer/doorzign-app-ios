@@ -160,10 +160,10 @@ struct LoginView: View {
 
     static func message(for error: SSOFlow.CallbackError) -> String {
         switch error {
-        case .provider(code: "access_denied"): "Die Anmeldung wurde abgelehnt."
-        case .provider(code: "expired"): "Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen."
-        case .provider: "Die Anmeldung beim Anbieter ist fehlgeschlagen."
-        case .stateMismatch, .invalidCallback: "Ungültige Antwort der Anmeldung. Bitte erneut versuchen."
+        case .provider(code: "access_denied"): String(localized: "Die Anmeldung wurde abgelehnt.")
+        case .provider(code: "expired"): String(localized: "Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen.")
+        case .provider: String(localized: "Die Anmeldung beim Anbieter ist fehlgeschlagen.")
+        case .stateMismatch, .invalidCallback: String(localized: "Ungültige Antwort der Anmeldung. Bitte erneut versuchen.")
         }
     }
 }

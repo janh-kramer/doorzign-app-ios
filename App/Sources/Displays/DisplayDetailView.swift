@@ -68,7 +68,7 @@ struct DisplayDetailView: View {
                     do {
                         let count = try await model.resend()
                         withAnimation {
-                            notice = count == 0 ? "Es gibt nichts erneut zu übertragen." : "Wird erneut übertragen."
+                            notice = count == 0 ? String(localized: "Es gibt nichts erneut zu übertragen.") : String(localized: "Wird erneut übertragen.")
                         }
                     } catch {
                         actionError = APIError.from(error)
@@ -127,7 +127,7 @@ struct DisplayDetailView: View {
 
                 ForEach(model.slots.filter(model.canActivate), id: \.slot) { slot in
                     Button {
-                        run { try await model.activate(slot: slot.slot) } success: { "Ansicht \(slot.slot) wird angezeigt." }
+                        run { try await model.activate(slot: slot.slot) } success: { String(localized: "Ansicht \(slot.slot) wird angezeigt.") }
                     } label: {
                         Label("Ansicht \(slot.slot) anzeigen", systemImage: "rectangle.portrait.on.rectangle.portrait")
                     }
@@ -142,7 +142,7 @@ struct DisplayDetailView: View {
                 }
                 if model.canIdentify {
                     Button {
-                        run { try await model.identify() } success: { "Das Display blinkt gleich." }
+                        run { try await model.identify() } success: { String(localized: "Das Display blinkt gleich.") }
                     } label: {
                         Label("Display finden", systemImage: "light.beacon.max")
                     }
@@ -161,7 +161,7 @@ struct DisplayDetailView: View {
     private func slotActions(_ slot: Slot) -> some View {
         if model.canActivate(slot) {
             Button("Diese Ansicht anzeigen", systemImage: "rectangle.portrait.on.rectangle.portrait") {
-                run { try await model.activate(slot: slot.slot) } success: { "Ansicht \(slot.slot) wird angezeigt." }
+                run { try await model.activate(slot: slot.slot) } success: { String(localized: "Ansicht \(slot.slot) wird angezeigt.") }
             }
         }
     }
@@ -225,7 +225,7 @@ struct DisplayDetailView: View {
             ForEach(model.schedules.prefix(3), id: \.id) { schedule in
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
-                        Text(schedule.name.isEmpty ? "Ansicht \(schedule.slot)" : schedule.name)
+                        Text(schedule.name.isEmpty ? String(localized: "Ansicht \(schedule.slot)") : schedule.name)
                         if !schedule.enabled {
                             Text("Aus").font(.caption2).foregroundStyle(.secondary)
                         }
@@ -326,20 +326,18 @@ struct DisplayHeader: View {
 
     static func licenseText(_ license: Display.LicensePayload) -> String {
         let name: String = switch license._type {
-        case "doorzign": "DoorZign-Lizenz"
-        case "ical_connect": "iCal-Connect-Lizenz"
-        case "none": "Keine Lizenz"
-        default: "Lizenz"
+        case "doorzign": String(localized: "DoorZign-Lizenz")
+        case "ical_connect": String(localized: "iCal-Connect-Lizenz")
+        case "none": String(localized: "Keine Lizenz")
+        default: String(localized: "Lizenz")
         }
         guard let validUntil = license.validUntil, license._type != "none" else { return name }
-        return "\(name), gültig bis \(Self.formatDate(validUntil))"
+        return String(localized: "\(name), gültig bis \(Self.formatDate(validUntil))")
     }
 
-    /// `YYYY-MM-DD` → „31.12.2026“.
+    /// `YYYY-MM-DD` → „31.12.2026“ (Format nach Gerätesprache).
     static func formatDate(_ value: String) -> String {
-        let parts = value.split(separator: "-")
-        guard parts.count == 3 else { return value }
-        return "\(parts[2]).\(parts[1]).\(parts[0])"
+        CalendarDay(value)?.displayText ?? value
     }
 }
 
@@ -415,7 +413,7 @@ struct CalendarSection: View {
                     VStack(alignment: .leading) {
                         Text(event.title)
                         Text(event.allDay == true
-                             ? "Ganztägig"
+                             ? String(localized: "Ganztägig")
                              : "\(event.start.formatted(date: .omitted, time: .shortened))–\(event.end.formatted(date: .omitted, time: .shortened))")
                             .font(.caption).foregroundStyle(.secondary)
                     }

@@ -55,6 +55,20 @@ docker run --rm --platform linux/amd64 -p 4010:4010 -v "$PWD/contract/dist":/c s
 In Debug-Builds gibt es im Willkommensbildschirm „Entwicklung: Mock-Server“ (Basis-URL ohne `/mobile/v1`,
 im Simulator `http://localhost:4010`, auf Geräten die IP des Macs).
 
+## Sprachen
+Deutsch ist Quellsprache: Der deutsche Text ist zugleich der Schlüssel. Englisch (Entwurf, mit Android abzustimmen) liegt in
+- `Packages/DoorZignKit/Sources/DoorZignCore/Resources/en.lproj/Localizable.strings` (Texte aus DoorZignCore, `L("…")`;
+  `LocalizationTests` prüft, dass jeder Schlüssel übersetzt ist),
+- `App/Resources/en.lproj/Localizable.strings` (SwiftUI-Texte) und `InfoPlist.strings` (Berechtigungstexte).
+
+```sh
+python3 scripts/check-app-strings.py   # findet App-Texte ohne englische Übersetzung
+```
+`.strings` statt String-Katalog, weil ohne Xcode kein `xcstringstool` verfügbar ist. Mit Xcode kann man später
+per „Migrate to String Catalog“ umstellen. Platzhalter: `%@` für Strings/Daten, `%lld` für Ganzzahlen.
+Texte, die als `String` statt `LocalizedStringKey` in die Oberfläche gehen, mit `String(localized:)` erzeugen.
+Fehlermeldungen des Servers (`error.message`) kommen vom Backend und bleiben dessen Sprache.
+
 ## Checkliste erster Xcode-Build
 Bisher ist die App nur per Typecheck unter macOS geprüft (`scripts/typecheck-app.sh`). Beim ersten echten Build:
 
@@ -62,6 +76,9 @@ Bisher ist die App nur per Typecheck unter macOS geprüft (`scripts/typecheck-ap
 - [ ] `brew install xcodegen && xcodegen generate`, Projekt öffnen; `DEVELOPMENT_TEAM` setzen; Bundle-ID `de.doorzign.app` im Team verfügbar?
 - [ ] Build für Simulator und Gerät ohne Fehler mit `SWIFT_STRICT_CONCURRENCY=complete`. Zuerst kompilieren `QRScannerView.swift`, `CameraPicker.swift`, `AppInfo.swift`: Sie waren vom Typecheck ausgenommen.
 - [ ] Unit-Tests von `DoorZignKit` in Xcode laufen lassen (Swift Testing), Ergebnis wie bei `test-kit.sh`.
+- [ ] Sprache: Schema → Run → App Language „English“: Oberfläche, Core-Texte (Status, Wochentage, Fehler) und
+  Berechtigungsdialoge auf Englisch; Xcode-Warnungen zu fehlenden Lokalisierungen prüfen (Compiler-Extraktion
+  `SWIFT_EMIT_LOC_STRINGS` findet ggf. mehr als `check-app-strings.py`).
 
 **Info.plist und Berechtigungen** (erzeugt aus `project.yml`)
 - [ ] Texte für `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription`, `NSLocalNetworkUsageDescription` erscheinen korrekt.

@@ -161,7 +161,7 @@ private struct WeekdayPicker: View {
 
 /// Optionales Datum: Schalter plus DatePicker.
 private struct OptionalDayPicker: View {
-    let title: String
+    let title: LocalizedStringKey
     @Binding var day: CalendarDay?
 
     var body: some View {

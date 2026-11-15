@@ -33,7 +33,7 @@ struct SettingsView: View {
                 Section("Benutzer") {
                     LabeledContent("Name", value: me.displayName)
                     LabeledContent("Benutzername", value: me.username)
-                    LabeledContent("Rolle", value: me.role == .admin ? "Administrator" : "Benutzer")
+                    LabeledContent("Rolle", value: me.role == .admin ? String(localized: "Administrator") : String(localized: "Benutzer"))
                 }
             }
 

@@ -51,7 +51,15 @@ public struct CalendarDay: Equatable, Comparable, Hashable, Sendable {
     }
 
     public var text: String { String(format: "%04d-%02d-%02d", year, month, day) }
-    public var displayText: String { String(format: "%02d.%02d.%04d", day, month, year) }
+    /// Kurzes Datum in der Sprache des Geräts, z. B. „01.12.2026“ bzw. „12/01/2026“.
+    public var displayText: String {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        var style = Date.FormatStyle.dateTime.day(.twoDigits).month(.twoDigits).year()
+        style.calendar = calendar
+        style.timeZone = calendar.timeZone
+        return date(in: calendar).formatted(style)
+    }
 
     public static func < (lhs: Self, rhs: Self) -> Bool { (lhs.year, lhs.month, lhs.day) < (rhs.year, rhs.month, rhs.day) }
 

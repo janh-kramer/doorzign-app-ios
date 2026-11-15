@@ -197,7 +197,7 @@ struct SlotEditorView: View {
     private var imageSections: some View {
         @Bindable var model = model
         // Die Label-Closure von PhotosPicker ist @Sendable – Wert vorher auf dem MainActor lesen.
-        let pickerTitle = model.draft.image.mediaId == nil ? "Foto auswählen" : "Anderes Foto auswählen"
+        let pickerTitle = model.draft.image.mediaId == nil ? String(localized: "Foto auswählen") : String(localized: "Anderes Foto auswählen")
         Section {
             if model.canUploadImage {
                 PhotosPicker(selection: $photoItem, matching: .images) {
@@ -261,7 +261,7 @@ struct SlotEditorView: View {
             case .running:
                 HStack { ProgressView(); Text("Kalender wird abgerufen …").foregroundStyle(.secondary) }
             case .ok(let count):
-                Label(count.map { "Kalender erreichbar, \($0) Termine gefunden." } ?? "Kalender erreichbar.",
+                Label(count.map { String(localized: "Kalender erreichbar, \($0) Termine gefunden.") } ?? String(localized: "Kalender erreichbar."),
                       systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
             case .failed(let message):
