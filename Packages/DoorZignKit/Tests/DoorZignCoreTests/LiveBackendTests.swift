@@ -49,6 +49,7 @@ struct LiveBackendTests {
 ///   DOORZIGN_LIVE_PREFIX    Präfix der Benutzernamen (Standard: mobile-conformance-) → <prefix>view|switch|edit
 ///   DOORZIGN_LIVE_DISPLAY   Name des freigegebenen Displays (Standard: Konformität A)
 ///   DOORZIGN_LIVE_HIDDEN    Name eines nicht freigegebenen Displays (Standard: Konformität B)
+///   DOORZIGN_LIVE_CALENDAR  Name eines Displays mit iCal auf Ansicht 1 (Standard: Konformität C; nur lesend, falls sichtbar)
 ///   DOORZIGN_LIVE_MUTATE=1  auch zustandsändernde Schritte (Umschalten, Ad-hoc); stellt Ansicht 1 wieder her
 /// Nicht parallel zur Konformitätssuite laufen lassen (gleiche Benutzer).
 private enum Live {
@@ -57,6 +58,7 @@ private enum Live {
     static let prefix = env["DOORZIGN_LIVE_PREFIX"] ?? "mobile-conformance-"
     static let display = env["DOORZIGN_LIVE_DISPLAY"] ?? "Konformität A"
     static let hidden = env["DOORZIGN_LIVE_HIDDEN"] ?? "Konformität B"
+    static let calendarDisplay = env["DOORZIGN_LIVE_CALENDAR"] ?? "Konformität C"
     static let mutate = env["DOORZIGN_LIVE_MUTATE"] == "1"
     static let link = env["DOORZIGN_LIVE_LINK"].flatMap { try? PairingLink.parse($0) }
     static var enabled: Bool { (liveURL != nil || link != nil) && password != nil }
@@ -173,6 +175,8 @@ struct LiveFlowTests {
         await editor.load()
         #expect(editor.loadError == nil)
 
+        try await calendarReadOnly(context)
+
         if Live.mutate {
             do {
                 try await mutatingFlow(context: context, display: display, detail: detail)
@@ -194,6 +198,31 @@ struct LiveFlowTests {
         let probeClient = ClientFactory.makeConnection(baseURL: context.profile.baseURL, trust: Live.trust(context.profile)).client
         let refreshed = try await probeClient.refreshToken(body: .json(.init(refreshToken: tokens.refreshToken)))
         if case .ok = refreshed { Issue.record("Refresh-Token muss nach dem Abmelden ungültig sein") }
+    }
+
+    /// Kalender-Display (falls für den Benutzer sichtbar): Status, Vorschau der iCal-Ansicht, URL-Prüfung ohne Speichern.
+    func calendarReadOnly(_ context: SignedInContext) async throws {
+        let list = DisplayListModel(client: context.client)
+        await list.load()
+        guard let display = list.displays.first(where: { $0.name == Live.calendarDisplay }) else { return }
+        let detail = DisplayDetailModel(displayId: display.id, initial: display, client: context.client, system: context.system)
+        await detail.load()
+        #expect(detail.error == nil)
+        let slot = try #require(detail.slots.first { $0.content.isCalendar }, "keine Kalenderansicht")
+        #expect(detail.showsCalendar)
+        #expect(detail.calendar != nil, "Kalenderstatus fehlt")
+        if let etag = slot.previewEtag {
+            let png = await context.previews.preview(displayId: display.id, slot: slot.slot, expectedEtag: etag)
+            #expect(png?.prefix(4) == Data([0x89, 0x50, 0x4E, 0x47]))
+        }
+        guard display.allows(.edit), case .calendar(let content) = slot.content, content.source == .ical, let url = content.url else { return }
+        let editor = SlotEditorModel(displayId: display.id, slot: slot.slot, display: detail.display,
+                                     client: context.client, system: context.system)
+        await editor.load()
+        #expect(editor.loadError == nil)
+        editor.draft.calendar.url = url
+        await editor.checkCalendar()
+        if case .ok = editor.calendarCheck {} else { Issue.record("Kalenderprüfung: \(editor.calendarCheck)") }
     }
 
     /// Umschalten, Editor mit Bild-Upload und Bibliothek (Original wird wiederhergestellt), 412, Ad-hoc, Zeitpläne.
