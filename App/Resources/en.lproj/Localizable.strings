@@ -57,7 +57,6 @@
 "Das Gateway „%@“ konnte nicht erreicht werden." = "The gateway “%@” could not be reached.";
 "Datenschutz" = "Privacy policy";
 "Dauer" = "Duration";
-"Den QR-Code findest du in Zeitwart in deinem Profil." = "You can find the QR code in Zeitwart in your profile.";
 "Den QR-Code findest du in der Edge-Weboberfläche unter „Mobile App verbinden“." = "You can find the QR code in the Edge web interface under “Mobile App verbinden” (Connect mobile app).";
 "Die Anmeldung beim Anbieter ist fehlgeschlagen." = "Sign-in with the provider failed.";
 "Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen." = "Sign-in took too long. Please try again.";
@@ -68,7 +67,7 @@
 "Diese Ansicht anzeigen" = "Show this view";
 "Diese Ansicht kann in der App nicht bearbeitet werden." = "This view cannot be edited in the app.";
 "Diese Ansicht wird auf dem Display nicht angeboten." = "This view is not offered on the display.";
-"Dieser QR-Code ist kein DoorZign-Verbindungscode. Bitte den Code aus „Mobile App verbinden“ (Edge) bzw. aus dem Zeitwart-Profil scannen." = "This QR code is not a DoorZign connection code. Please scan the code from “Mobile App verbinden” (Edge) or from your Zeitwart profile.";
+"Dieser QR-Code ist kein DoorZign-Verbindungscode." = "This QR code is not a DoorZign connection code.";
 "Dieses Gerät" = "This device";
 "Dir sind noch keine Displays freigegeben." = "No displays have been shared with you yet.";
 "Display" = "Display";
@@ -238,3 +237,4 @@
 "Übertragungen" = "Transfers";
 "über Mitternacht" = "past midnight";
 "„%@“ wird entfernt." = "“%@” will be removed.";
+"Unter diesem Namen erkennt dein Administrator das Gerät. Zum Abmelden einzelner Geräte wende dich an deinen Administrator." = "Your administrator can identify the device by this name. To sign out individual devices, contact your administrator.";

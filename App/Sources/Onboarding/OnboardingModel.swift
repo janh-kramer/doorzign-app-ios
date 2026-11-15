@@ -42,7 +42,7 @@ final class OnboardingModel {
         do {
             await connect(link: try PairingLink.parse(scannedCode), session: session)
         } catch {
-            errorMessage = String(localized: "Dieser QR-Code ist kein DoorZign-Verbindungscode. Bitte den Code aus „Mobile App verbinden“ (Edge) bzw. aus dem Zeitwart-Profil scannen.")
+            errorMessage = String(localized: "Dieser QR-Code ist kein DoorZign-Verbindungscode.")
         }
     }
 

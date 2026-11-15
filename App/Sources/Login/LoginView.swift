@@ -94,7 +94,10 @@ struct LoginView: View {
                 } header: {
                     Text("Dieses Gerät")
                 } footer: {
-                    Text("Unter diesem Namen erscheint das Gerät in der Weboberfläche unter „Verbundene Geräte“.")
+                    // Cloud: keine Zeitwart-Menünamen, neutral auf den Administrator verweisen.
+                    Text(context.profile.systemType == .edge
+                         ? "Unter diesem Namen erscheint das Gerät in der Weboberfläche unter „Verbundene Geräte“."
+                         : "Unter diesem Namen erkennt dein Administrator das Gerät. Zum Abmelden einzelner Geräte wende dich an deinen Administrator.")
                 }
 
                 if !showsPasswordForm && context.browserProviders.isEmpty {

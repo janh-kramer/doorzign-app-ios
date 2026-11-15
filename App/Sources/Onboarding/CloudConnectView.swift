@@ -1,7 +1,7 @@
 import DoorZignCore
 import SwiftUI
 
-/// Onboarding Cloud: Instanz eingeben oder QR-Code aus dem Zeitwart-Profil scannen.
+/// Onboarding Cloud: Instanz eingeben (oder Verbindungs-QR-Code scannen, falls vorhanden).
 struct CloudConnectView: View {
     @Environment(AppSession.self) private var session
     @Environment(OnboardingModel.self) private var model
@@ -32,14 +32,13 @@ struct CloudConnectView: View {
 
             ErrorSection(message: model.errorMessage)
 
+            // Keine Zeitwart-Menünamen in App-Texten (Koordination 2026-11-15): Zeitwart bietet (noch) keinen QR-Code.
             Section {
                 Button {
                     showScanner = true
                 } label: {
                     Label("QR-Code scannen", systemImage: "qrcode.viewfinder")
                 }
-            } footer: {
-                Text("Den QR-Code findest du in Zeitwart in deinem Profil.")
             }
         }
         .navigationTitle("Zeitwart Cloud")
