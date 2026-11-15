@@ -57,7 +57,7 @@
 "Das Gateway „%@“ konnte nicht erreicht werden." = "The gateway “%@” could not be reached.";
 "Datenschutz" = "Privacy policy";
 "Dauer" = "Duration";
-"Den QR-Code findest du in der Edge-Weboberfläche unter „Mobile App verbinden“." = "You can find the QR code in the Edge web interface under “Mobile App verbinden” (Connect mobile app).";
+"Den QR-Code findest du in der Edge-Weboberfläche unter „DoorZign-App verbinden“." = "You can find the QR code in the Edge web interface under “Connect the DoorZign app”.";
 "Die Anmeldung beim Anbieter ist fehlgeschlagen." = "Sign-in with the provider failed.";
 "Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen." = "Sign-in took too long. Please try again.";
 "Die Anmeldung wurde abgelehnt." = "Sign-in was denied.";
@@ -187,13 +187,13 @@
 "Titel" = "Title";
 "Typ" = "Type";
 "Ungültige Antwort der Anmeldung. Bitte erneut versuchen." = "Invalid sign-in response. Please try again.";
-"Unter diesem Namen erscheint das Gerät in der Weboberfläche unter „Verbundene Geräte“." = "The device appears under this name in the web interface under “Verbundene Geräte” (Connected devices).";
+"Unter diesem Namen erscheint das Gerät in der Weboberfläche unter „Verbundene Geräte“." = "The device appears under this name in the web interface under “Connected devices”.";
 "Unterüberschrift" = "Subheadline";
 "Verbinden" = "Connect";
 "Verbindung trennen" = "Disconnect";
 "Verbindung über das Internet" = "Connection via the internet";
 "Verbunden mit" = "Connected to";
-"Vergleiche den Fingerabdruck mit der Anzeige in der Edge-Weboberfläche unter „Mobile App verbinden“. Verbinde dich nur, wenn er übereinstimmt." = "Compare the fingerprint with the one shown in the Edge web interface under “Mobile App verbinden” (Connect mobile app). Only connect if it matches.";
+"Vergleiche den Fingerabdruck mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt." = "Compare the fingerprint with the one shown in the Edge web interface under “Connect the DoorZign app”. Only connect if it matches.";
 "Version" = "Version";
 "Verwerfen" = "Discard";
 "Vollständig anzeigen" = "Show in full";

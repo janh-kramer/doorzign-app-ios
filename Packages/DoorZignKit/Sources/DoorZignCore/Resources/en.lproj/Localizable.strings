@@ -1,6 +1,6 @@
 /* DoorZignCore – Englisch. Schlüssel = deutscher Quelltext (Platzhalter %@ / %lld). ENTWURF, mit Android abzustimmen. */
 
-"Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „Mobile App verbinden“ erneut scannen." = "The system's certificate does not match the QR code. Please scan the QR code again in the Edge web interface under “Mobile App verbinden” (Connect mobile app).";
+"Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „DoorZign-App verbinden“ erneut scannen." = "The system's certificate does not match the QR code. Please scan the QR code again in the Edge web interface under “Connect the DoorZign app”.";
 "Unter dieser Adresse antwortet eine andere DoorZign-Installation als im QR-Code angegeben." = "A different DoorZign installation than the one in the QR code responds at this address.";
 "Das System ist nicht erreichbar." = "The system cannot be reached.";
 "Für dieses Display ist keine gültige Lizenz vorhanden." = "There is no valid license for this display.";

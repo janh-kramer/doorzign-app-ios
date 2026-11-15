@@ -22,7 +22,7 @@ public enum ProbeError: Error, Equatable, Sendable, LocalizedError {
         case .unreachable(let error):
             error.message
         case .fingerprintMismatch:
-            L("Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „Mobile App verbinden“ erneut scannen.")
+            L("Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „DoorZign-App verbinden“ erneut scannen.")
         case .instanceMismatch:
             L("Unter dieser Adresse antwortet eine andere DoorZign-Installation als im QR-Code angegeben.")
         }

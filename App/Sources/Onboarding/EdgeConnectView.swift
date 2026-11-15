@@ -20,7 +20,7 @@ struct EdgeConnectView: View {
                         .font(.headline)
                 }
             } footer: {
-                Text("Den QR-Code findest du in der Edge-Weboberfläche unter „Mobile App verbinden“.")
+                Text("Den QR-Code findest du in der Edge-Weboberfläche unter „DoorZign-App verbinden“.")
             }
 
             ErrorSection(message: model.errorMessage)
@@ -116,7 +116,7 @@ struct FingerprintConfirmView: View {
                 } header: {
                     Text("Zertifikats-Fingerabdruck")
                 } footer: {
-                    Text("Vergleiche den Fingerabdruck mit der Anzeige in der Edge-Weboberfläche unter „Mobile App verbinden“. Verbinde dich nur, wenn er übereinstimmt.")
+                    Text("Vergleiche den Fingerabdruck mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt.")
                 }
                 Section {
                     Button("Stimmt überein – verbinden") {
