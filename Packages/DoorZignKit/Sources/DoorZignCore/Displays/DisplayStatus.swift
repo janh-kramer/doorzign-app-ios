@@ -1,0 +1,125 @@
+import DoorZignAPI
+import Foundation
+
+public typealias Display = Components.Schemas.Display
+
+/// Akkustand nach ui-spec: < 15 % kritisch, < 30 % schwach.
+public enum BatteryLevel: Equatable, Sendable {
+    case critical, low, normal, unknown
+
+    public init(percent: Int?) {
+        switch percent {
+        case nil: self = .unknown
+        case let p? where p < 15: self = .critical
+        case let p? where p < 30: self = .low
+        default: self = .normal
+        }
+    }
+
+    public var label: String {
+        switch self {
+        case .critical: "Kritisch"
+        case .low: "Schwach"
+        case .normal: "Normal"
+        case .unknown: "Unbekannt"
+        }
+    }
+}
+
+/// Signalstärke nach ui-spec: ≥ −65 dBm gut, ≥ −80 dBm mittel, sonst schwach.
+public enum SignalQuality: Equatable, Sendable {
+    case good, medium, weak, unknown
+
+    public init(rssi: Int?) {
+        switch rssi {
+        case nil: self = .unknown
+        case let r? where r >= -65: self = .good
+        case let r? where r >= -80: self = .medium
+        default: self = .weak
+        }
+    }
+
+    public var label: String {
+        switch self {
+        case .good: "Gut"
+        case .medium: "Mittel"
+        case .weak: "Schwach"
+        case .unknown: "Unbekannt"
+        }
+    }
+
+    /// Anzahl gefüllter Balken (von 3).
+    public var bars: Int {
+        switch self {
+        case .good: 3
+        case .medium: 2
+        case .weak: 1
+        case .unknown: 0
+        }
+    }
+}
+
+/// Filter der Displayliste.
+public enum DisplayFilter: String, CaseIterable, Identifiable, Sendable {
+    case all, offline, lowBattery, error, transferring
+
+    public var id: Self { self }
+
+    public var label: String {
+        switch self {
+        case .all: "Alle"
+        case .offline: "Offline"
+        case .lowBattery: "Akku schwach"
+        case .error: "Fehler"
+        case .transferring: "Übertragung offen"
+        }
+    }
+
+    public func matches(_ display: Display) -> Bool {
+        switch self {
+        case .all: true
+        case .offline: !display.online
+        case .lowBattery: [.critical, .low].contains(BatteryLevel(percent: display.battery))
+        case .error: !(display.lastError ?? "").isEmpty
+        case .transferring: display.openJobs > 0
+        }
+    }
+}
+
+extension Display {
+    public var batteryLevel: BatteryLevel { BatteryLevel(percent: battery) }
+    public var signalQuality: SignalQuality { SignalQuality(rssi: signal) }
+
+    /// ETag der Vorschau der aktiven Ansicht (aus `slots`).
+    public var activePreviewEtag: String? {
+        slots.first { $0.slot == activeSlot }?.previewEtag
+    }
+
+    /// Mindestens Stufe `level`? (`view ⊂ switch ⊂ edit`)
+    public func allows(_ required: Components.Schemas.AccessLevel) -> Bool {
+        func rank(_ l: Components.Schemas.AccessLevel) -> Int {
+            switch l {
+            case .view: 0
+            case ._switch: 1
+            case .edit: 2
+            }
+        }
+        return rank(level) >= rank(required)
+    }
+}
+
+public enum DisplayListLogic {
+    /// Filtert, durchsucht (Name, Ort, MAC) und sortiert nach Name.
+    public static func apply(_ displays: [Display], filter: DisplayFilter, search: String) -> [Display] {
+        let query = search.trimmingCharacters(in: .whitespaces)
+        return displays
+            .filter(filter.matches)
+            .filter { display in
+                query.isEmpty
+                    || display.name.localizedCaseInsensitiveContains(query)
+                    || (display.location ?? "").localizedCaseInsensitiveContains(query)
+                    || display.mac.localizedCaseInsensitiveContains(query)
+            }
+            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+    }
+}

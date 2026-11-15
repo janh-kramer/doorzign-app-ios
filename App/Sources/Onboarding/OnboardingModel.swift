@@ -1,0 +1,152 @@
+import DoorZignCore
+import Foundation
+import Observation
+
+/// Ablauflogik des Onboardings: Adressen prüfen, Fingerprint bestätigen lassen, Anmeldung vorbereiten.
+@MainActor
+@Observable
+final class OnboardingModel {
+    /// Fingerprint, den der Benutzer bestätigen muss (Trust on first use).
+    struct PendingTrust: Identifiable {
+        let id = UUID()
+        let probe: ProbeResult
+        let fingerprint: String
+    }
+
+    var isBusy = false
+    var errorMessage: String?
+    var pendingTrust: PendingTrust?
+    /// Über `onOpenURL` eingegangener QR-Link, der verarbeitet werden soll.
+    var pendingLink: PairingLink?
+
+    // MARK: QR-Code / Link
+
+    func connect(link: PairingLink, session: AppSession) async {
+        await run {
+            switch link {
+            case .edge(let urls, let fingerprint, let instanceId, _):
+                let probe = try await SystemProbe.probe(
+                    urls: urls,
+                    trust: .pinned(fingerprint: fingerprint),
+                    expectedInstanceId: instanceId
+                )
+                return await session.prepareLogin(probe: probe, pinnedFingerprint: fingerprint, alternativeURLs: urls)
+            case .cloud(let url, _):
+                let probe = try await SystemProbe.probe(urls: [url], trust: .system)
+                return await session.prepareLogin(probe: probe, pinnedFingerprint: nil)
+            }
+        }
+    }
+
+    func connect(scannedCode: String, session: AppSession) async {
+        do {
+            await connect(link: try PairingLink.parse(scannedCode), session: session)
+        } catch {
+            errorMessage = "Dieser QR-Code ist kein DoorZign-Verbindungscode. Bitte den Code aus „Mobile App verbinden“ (Edge) bzw. aus dem Zeitwart-Profil scannen."
+        }
+    }
+
+    // MARK: Edge ohne QR-Code (TOFU)
+
+    func connectEdge(address: String) async {
+        guard let url = APIBase.edge(fromInput: address) else {
+            errorMessage = "Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:8443."
+            return
+        }
+        await probeForTrust(url: url)
+    }
+
+    func connectEdge(gateway: DiscoveredGateway) async {
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let url = try await GatewayBrowser.resolve(gateway)
+            await probeForTrust(url: url)
+        } catch {
+            errorMessage = "Das Gateway „\(gateway.displayName)“ konnte nicht erreicht werden."
+        }
+    }
+
+    private func probeForTrust(url: URL) async {
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let probe = try await SystemProbe.probe(urls: [url], trust: .captureForConfirmation)
+            guard let fingerprint = probe.presentedFingerprint else {
+                errorMessage = "Das Gateway hat kein Zertifikat vorgelegt."
+                return
+            }
+            pendingTrust = PendingTrust(probe: probe, fingerprint: fingerprint)
+        } catch {
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? APIError.from(error).message
+        }
+    }
+
+    /// Der Benutzer hat den Fingerprint verglichen und bestätigt.
+    func confirmTrust(_ trust: PendingTrust, session: AppSession) async {
+        pendingTrust = nil
+        await run {
+            await session.prepareLogin(probe: trust.probe, pinnedFingerprint: trust.fingerprint)
+        }
+    }
+
+    // MARK: Cloud
+
+    func connectCloud(input: String, session: AppSession) async {
+        guard let url = APIBase.cloud(fromInput: input) else {
+            errorMessage = "Bitte den Namen der Instanz (z. B. „firma“) oder die vollständige Adresse eingeben."
+            return
+        }
+        await run {
+            let probe = try await SystemProbe.probe(urls: [url], trust: .system)
+            return await session.prepareLogin(probe: probe, pinnedFingerprint: nil)
+        }
+    }
+
+    #if DEBUG
+    /// Entwicklung gegen den Prism-Mock (Pfade ohne /mobile/v1, nur HTTP).
+    func connectMock(address: String, session: AppSession) async {
+        guard let url = URL(string: address) else { return }
+        await run {
+            let probe = try await SystemProbe.probe(urls: [url], trust: .system)
+            return await session.prepareLogin(probe: probe, pinnedFingerprint: nil)
+        }
+    }
+    #endif
+
+    // MARK: Hilfen
+
+    /// Führt einen Schritt aus; `APIError` als Rückgabe oder geworfene Fehler landen in `errorMessage`.
+    private func run(_ step: () async throws -> APIError?) async {
+        isBusy = true
+        errorMessage = nil
+        defer { isBusy = false }
+        do {
+            if let error = try await step() {
+                errorMessage = error.message
+            }
+        } catch {
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? APIError.from(error).message
+        }
+    }
+}
+
+/// SwiftUI-Hülle um den mDNS-Browser.
+@MainActor
+@Observable
+final class GatewaySearch {
+    private(set) var gateways: [DiscoveredGateway] = []
+    private(set) var state: GatewayBrowser.State = .idle
+    @ObservationIgnored private let browser = GatewayBrowser()
+
+    init() {
+        browser.onChange = { [weak self] in
+            guard let self else { return }
+            self.gateways = self.browser.gateways
+            self.state = self.browser.state
+        }
+    }
+
+    func start() { browser.start() }
+    func stop() { browser.stop() }
+}
