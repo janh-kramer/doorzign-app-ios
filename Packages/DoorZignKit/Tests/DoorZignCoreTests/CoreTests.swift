@@ -85,6 +85,26 @@ import Testing
         #expect(throws: SSOFlow.CallbackError.provider(code: "access_denied")) {
             try SSOFlow.code(from: URL(string: "doorzign://auth/callback?error=access_denied&state=\(p.state)")!, expectedState: p.state)
         }
+        // Zeitwart (6c5bcd006): ungültige Parameter → invalid_request; expired/provider_error werden verstanden.
+        for code in ["invalid_request", "expired", "provider_error", "unbekannt"] {
+            #expect(throws: SSOFlow.CallbackError.provider(code: code)) {
+                try SSOFlow.code(from: URL(string: "doorzign://auth/callback?error=\(code)&state=\(p.state)")!, expectedState: p.state)
+            }
+        }
+    }
+
+    @Test func callbackTexte() throws {
+        let de = try #require(CoreL10n.bundle(language: "de"))
+        CoreL10n.$bundleOverride.withValue(de) {
+            #expect(SSOFlow.message(for: .provider(code: "invalid_request")) == "Die Anmeldung konnte nicht gestartet werden. Bitte erneut versuchen.")
+            #expect(SSOFlow.message(for: .provider(code: "expired")) == "Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen.")
+            #expect(SSOFlow.message(for: .provider(code: "provider_error")) == "Die Anmeldung beim Anbieter ist fehlgeschlagen.")
+            #expect(SSOFlow.message(for: .stateMismatch) == "Ungültige Antwort der Anmeldung. Bitte erneut versuchen.")
+            // invalid_grant beim Code-Tausch (abgelaufen, schon benutzt, falscher Verifier).
+            let grant = APIError(code: "invalid_grant", message: "Server", statusCode: 401).forSSO
+            #expect(grant.message == "Die Anmeldung ist abgelaufen. Bitte erneut anmelden.")
+            #expect(APIError(code: "forbidden", message: "x").forSSO.message == "x")
+        }
     }
 
     @Test func startURL() {

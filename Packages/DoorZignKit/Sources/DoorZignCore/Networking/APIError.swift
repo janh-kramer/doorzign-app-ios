@@ -59,6 +59,11 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
         statusCode == 401 && code == "unauthorized" ? with(message: L("Benutzername oder Passwort ist falsch.")) : self
     }
 
+    /// SSO-Abschluss: `invalid_grant` = Code abgelaufen (60 s), schon benutzt oder Verifier falsch.
+    public var forSSO: APIError {
+        code == "invalid_grant" ? with(message: L("Die Anmeldung ist abgelaufen. Bitte erneut anmelden.")) : self
+    }
+
     /// Gleicher Fehler mit anderem Anzeigetext.
     public func with(message: String) -> APIError {
         APIError(code: code, message: message, fields: fields, statusCode: statusCode)

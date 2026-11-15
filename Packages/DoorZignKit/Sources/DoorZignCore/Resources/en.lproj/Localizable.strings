@@ -35,6 +35,11 @@
 "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an." = "Your session has expired. Please sign in again.";
 "Der Kalender konnte nicht abgerufen werden." = "The calendar could not be retrieved.";
 "Der Zeitplan wurde inzwischen geändert. Die Liste wurde neu geladen." = "The schedule has been changed in the meantime. The list has been reloaded.";
+"Die Anmeldung beim Anbieter ist fehlgeschlagen." = "Sign-in with the provider failed.";
+"Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen." = "Sign-in took too long. Please try again.";
+"Die Anmeldung ist abgelaufen. Bitte erneut anmelden." = "Sign-in has expired. Please sign in again.";
+"Die Anmeldung konnte nicht gestartet werden. Bitte erneut versuchen." = "Sign-in could not be started. Please try again.";
+"Die Anmeldung wurde abgelehnt." = "Sign-in was denied.";
 "Die Antwort des Systems ist nicht lesbar. Bitte App aktualisieren." = "The system's response could not be read. Please update the app.";
 "Die Datei ist zu groß." = "The file is too large.";
 "Die Priorität muss zwischen 0 und 100 liegen." = "Priority must be between 0 and 100.";
@@ -75,6 +80,7 @@
 "Täglich" = "Daily";
 "Unbekannt" = "Unknown";
 "Unerwartete Antwort vom System (%lld)." = "Unexpected response from the system (%lld).";
+"Ungültige Antwort der Anmeldung. Bitte erneut versuchen." = "Invalid sign-in response. Please try again.";
 "Unter dieser Adresse antwortet eine andere DoorZign-Installation als im QR-Code angegeben." = "A different DoorZign installation than the one in the QR code responds at this address.";
 "Unterüberschrift" = "Subheadline";
 "Vorschau nach dem Kürzen" = "Preview after shortening";

@@ -62,6 +62,18 @@ public enum SSOFlow {
         case provider(code: String)
     }
 
+    /// Anzeigetext für einen fehlerhaften Rückruf. Bekannte `error`-Werte: `access_denied`, `invalid_request`,
+    /// `expired`, `provider_error`; Unbekanntes gilt als Fehler beim Anbieter.
+    public static func message(for error: CallbackError) -> String {
+        switch error {
+        case .provider(code: "access_denied"): L("Die Anmeldung wurde abgelehnt.")
+        case .provider(code: "expired"): L("Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen.")
+        case .provider(code: "invalid_request"): L("Die Anmeldung konnte nicht gestartet werden. Bitte erneut versuchen.")
+        case .provider: L("Die Anmeldung beim Anbieter ist fehlgeschlagen.")
+        case .stateMismatch, .invalidCallback: L("Ungültige Antwort der Anmeldung. Bitte erneut versuchen.")
+        }
+    }
+
     /// Liefert den Einmalcode aus dem Rückruf oder einen Fehler.
     public static func code(from callback: URL, expectedState: String) throws -> String {
         guard let components = URLComponents(url: callback, resolvingAgainstBaseURL: false),

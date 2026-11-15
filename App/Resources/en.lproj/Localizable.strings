@@ -25,6 +25,7 @@
 "Anmelden" = "Sign in";
 "Anmelden mit %@" = "Sign in with %@";
 "Anmelden über" = "Sign in with";
+"Anmeldung abgebrochen." = "Sign-in cancelled.";
 "Ansicht" = "View";
 "Ansicht %lld" = "View %lld";
 "Ansicht %lld anzeigen" = "Show view %lld";
@@ -59,9 +60,6 @@
 "Datenschutz" = "Privacy policy";
 "Dauer" = "Duration";
 "Den QR-Code findest du in der Edge-Weboberfläche unter „DoorZign-App verbinden“." = "You can find the QR code in the Edge web interface under “Connect the DoorZign app”.";
-"Die Anmeldung beim Anbieter ist fehlgeschlagen." = "Sign-in with the provider failed.";
-"Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen." = "Sign-in took too long. Please try again.";
-"Die Anmeldung wurde abgelehnt." = "Sign-in was denied.";
 "Die Nachricht ersetzt vorübergehend alle Textansichten. Bild- und Kalenderansichten bleiben unverändert." = "The message temporarily replaces all text views. Image and calendar views stay unchanged.";
 "Die gerade angezeigte Ansicht kann nicht deaktiviert werden." = "The view currently shown cannot be deactivated.";
 "Die Änderungen an dieser Ansicht wurden noch nicht gespeichert." = "The changes to this view have not been saved yet.";
@@ -184,7 +182,6 @@
 "Text" = "Text";
 "Titel" = "Title";
 "Typ" = "Type";
-"Ungültige Antwort der Anmeldung. Bitte erneut versuchen." = "Invalid sign-in response. Please try again.";
 "Unter diesem Namen erkennt dein Administrator das Gerät. Zum Abmelden einzelner Geräte wende dich an deinen Administrator." = "Your administrator uses this name to identify the device. To sign out individual devices, contact your administrator.";
 "Unter diesem Namen erscheint das Gerät in der Weboberfläche unter „Verbundene Geräte“." = "The device appears under this name in the web interface under “Connected devices”.";
 "Unterüberschrift" = "Subheadline";

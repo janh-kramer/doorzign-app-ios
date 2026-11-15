@@ -95,7 +95,8 @@ Bisher ist die App nur per Typecheck unter macOS geprüft (`scripts/typecheck-ap
 - [ ] Foto aus der Mediathek (auch HEIC) → Upload → Vorschau; „Aus Bibliothek“ zeigt Miniaturen (Bearer).
 
 **Anmeldung per SSO**
-- [ ] `ASWebAuthenticationSession` über `@Environment(\.webAuthenticationSession)`: Login-Seite öffnet sich, Rückruf auf Schema `doorzign` beendet die Sitzung, Abbruch durch den Benutzer ohne Fehlermeldung. Braucht ein Backend mit SSO-Anbieter; Edge-Konformität und lokales Zeitwart haben bisher nur Passwort.
+- [ ] `ASWebAuthenticationSession` über `@Environment(\.webAuthenticationSession)` mit `preferredBrowserSession: .ephemeral`: Login-Seite öffnet sich (ohne alte Web-Session), Rückruf auf Schema `doorzign` beendet die Sitzung.
+- [ ] Lokales Zeitwart (Anbieter `hsos`, SAML2): erfolgreicher Login; IdP-Fehler bleibt im Browser stehen → Benutzer schließt → nur Hinweis „Anmeldung abgebrochen.“, kein Fehler; Code > 60 s bzw. doppelt → „Die Anmeldung ist abgelaufen …“ (`invalid_grant`).
 
 **Lokales Netzwerk und TLS**
 - [ ] Local-Network-Abfrage erscheint beim ersten Start der Gateway-Suche (nur auf dem Gerät). Ablehnen → manuelle Eingabe funktioniert; Suche erneut nach Freigabe in den Systemeinstellungen.

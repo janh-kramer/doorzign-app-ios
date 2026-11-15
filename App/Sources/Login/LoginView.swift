@@ -16,6 +16,8 @@ struct LoginView: View {
     @State private var passwordProvider: String?
     @State private var isBusy = false
     @State private var error: APIError?
+    /// Ruhiger Hinweis ohne Fehlerdarstellung (z. B. SSO vom Benutzer abgebrochen).
+    @State private var notice: String?
 
     private enum Field { case username, password }
     @FocusState private var focus: Field?
@@ -37,6 +39,9 @@ struct LoginView: View {
                 }
 
                 ErrorSection(message: error?.message)
+                if let notice {
+                    Section { Text(notice).foregroundStyle(.secondary) }
+                }
 
                 if showsPasswordForm {
                     Section {
@@ -126,6 +131,7 @@ struct LoginView: View {
         Task {
             isBusy = true
             defer { isBusy = false }
+            notice = nil
             do {
                 try await session.login(context: context, username: username, password: password, provider: passwordProvider)
             } catch {
@@ -145,28 +151,25 @@ struct LoginView: View {
             appVersion: session.appVersion
         ) else { return }
         error = nil
+        notice = nil
         do {
-            // Kein ephemerer Browser: vorhandene Anmeldungen beim Identity Provider (z. B. Microsoft) werden genutzt.
-            let callback = try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: SSOFlow.callbackScheme)
+            // Ephemerer Browser (Koordination 2026-11-15): Zeitwart schließt nur ab, wenn die Anmeldung nach dem Start
+            // im selben Browser erfolgt; eine ältere Web-Session hilft nicht (→ access_denied).
+            let callback = try await webAuthenticationSession.authenticate(
+                using: url, callbackURLScheme: SSOFlow.callbackScheme, preferredBrowserSession: .ephemeral
+            )
             let code = try SSOFlow.code(from: callback, expectedState: pkce.state)
             isBusy = true
             defer { isBusy = false }
             try await session.completeSSO(context: context, code: code, verifier: pkce.verifier)
         } catch let authError as ASWebAuthenticationSessionError where authError.code == .canceledLogin {
-            // Vom Benutzer abgebrochen – kein Fehler.
+            // Vom Benutzer geschlossen – auch wenn der IdP-Fehler im Browser stehen blieb (Zeitwart sendet dann
+            // kein error=). Kein Fehlerdialog, nur ein ruhiger Hinweis.
+            notice = String(localized: "Anmeldung abgebrochen.")
         } catch let callbackError as SSOFlow.CallbackError {
-            error = APIError(code: "sso", message: Self.message(for: callbackError))
+            error = APIError(code: "sso", message: SSOFlow.message(for: callbackError))
         } catch {
-            self.error = APIError.from(error)
-        }
-    }
-
-    static func message(for error: SSOFlow.CallbackError) -> String {
-        switch error {
-        case .provider(code: "access_denied"): String(localized: "Die Anmeldung wurde abgelehnt.")
-        case .provider(code: "expired"): String(localized: "Die Anmeldung hat zu lange gedauert. Bitte erneut versuchen.")
-        case .provider: String(localized: "Die Anmeldung beim Anbieter ist fehlgeschlagen.")
-        case .stateMismatch, .invalidCallback: String(localized: "Ungültige Antwort der Anmeldung. Bitte erneut versuchen.")
+            self.error = APIError.from(error).forSSO
         }
     }
 }
