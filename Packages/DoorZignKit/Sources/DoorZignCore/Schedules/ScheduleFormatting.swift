@@ -7,6 +7,12 @@ public enum ScheduleFormatting {
         return Array(symbols[1...]) + [symbols[0]]
     }
 
+    /// Voller Wochentagsname aus der Locale (1 = Montag … 7 = Sonntag), z. B. für VoiceOver.
+    public static func fullName(_ day: Int) -> String {
+        let symbols = CoreL10n.utcCalendar.standaloneWeekdaySymbols  // beginnt mit Sonntag
+        return symbols[day % 7]
+    }
+
     /// Wochentage (1 = Montag … 7 = Sonntag) kompakt: `[1,2,3,4,5]` → „Mo–Fr“, `[1,3,5]` → „Mo, Mi, Fr“,
     /// alle sieben → „Täglich“. Folgen ab drei Tagen werden zusammengefasst.
     public static func weekdays(_ days: [Int]) -> String {

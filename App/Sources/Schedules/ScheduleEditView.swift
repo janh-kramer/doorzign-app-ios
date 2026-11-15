@@ -140,22 +140,52 @@ struct ScheduleEditView: View {
 /// Wochentage als Umschaltknöpfe Mo–So (1 = Montag).
 private struct WeekdayPicker: View {
     @Binding var selection: Set<Int>
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @State private var rowWidth: CGFloat = 0
+
+    private let spacing: CGFloat = 6
+    private let inset: CGFloat = 4
+
+    /// Eine gemeinsame Schriftgröße für alle Kapseln (ui-spec §Zeitpläne): so groß, wie Dynamic Type
+    /// vorgibt, höchstens so groß, dass das breiteste Kürzel (fett) in eine Kapsel passt. So werden bei
+    /// großer Schrift alle Kürzel gleich verkleinert statt einzeln oder per Umbruch.
+    private var fontSize: CGFloat {
+        let traits = UITraitCollection(preferredContentSizeCategory: UIContentSizeCategory(typeSize))
+        let base = UIFont.preferredFont(forTextStyle: .subheadline, compatibleWith: traits).pointSize
+        guard rowWidth > 0 else { return base }
+        let available = (rowWidth - spacing * 6) / 7 - inset * 2
+        let font = UIFont.systemFont(ofSize: base, weight: .semibold)
+        let widest = ScheduleFormatting.abbreviations
+            .map { ($0 as NSString).size(withAttributes: [.font: font]).width }
+            .max() ?? 0
+        guard widest > available, available > 0 else { return base }
+        return max(base * available / widest, 8)
+    }
 
     var body: some View {
-        HStack(spacing: 6) {
+        // Sieben gleich breite Kapseln in einer Zeile, Kürzel einzeilig.
+        HStack(spacing: spacing) {
             ForEach(1...7, id: \.self) { day in
                 let selected = selection.contains(day)
-                Button(ScheduleFormatting.abbreviations[day - 1]) {
+                Button {
                     if selected { selection.remove(day) } else { selection.insert(day) }
+                } label: {
+                    Text(ScheduleFormatting.abbreviations[day - 1])
+                        .font(.system(size: fontSize, weight: selected ? .semibold : .regular))
+                        .lineLimit(1)
+                        .padding(.horizontal, inset)
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .foregroundStyle(selected ? Color.white : Color.primary)
+                        .background(selected ? Color.accentColor : Color(.tertiarySystemFill), in: Capsule())
+                        .contentShape(Capsule())
                 }
-                .buttonStyle(.bordered)
-                .tint(selected ? .accentColor : .secondary)
-                .fontWeight(selected ? .semibold : .regular)
+                .buttonStyle(.plain)
+                .accessibilityLabel(ScheduleFormatting.fullName(day))
                 .accessibilityAddTraits(selected ? .isSelected : [])
-                .frame(maxWidth: .infinity)
             }
         }
         .frame(maxWidth: .infinity)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { rowWidth = $0 }
     }
 }
 

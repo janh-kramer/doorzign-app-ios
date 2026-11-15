@@ -11,6 +11,17 @@ import Testing
         #expect(ScheduleFormatting.weekdays([]) == "–")
     }
 
+    @Test func volleWochentagsnamen() throws {
+        try CoreL10n.$bundleOverride.withValue(try #require(CoreL10n.bundle(language: "de"))) {
+            #expect(ScheduleFormatting.fullName(1) == "Montag")
+            #expect(ScheduleFormatting.fullName(7) == "Sonntag")
+        }
+        try CoreL10n.$bundleOverride.withValue(try #require(CoreL10n.bundle(language: "en"))) {
+            #expect(ScheduleFormatting.fullName(1) == "Monday")
+            #expect(ScheduleFormatting.fullName(6) == "Saturday")
+        }
+    }
+
     @Test func zeitfenster() throws {
         // Uhrzeiten aus der Locale: feste deutsche Locale für reproduzierbare Werte.
         try CoreL10n.$bundleOverride.withValue(try #require(CoreL10n.bundle(language: "de"))) {
