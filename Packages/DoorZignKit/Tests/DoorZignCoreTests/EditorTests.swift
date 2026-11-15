@@ -330,3 +330,32 @@ final class RoutingStubTransport: ClientTransport, @unchecked Sendable {
         #expect(model.previewError == "Überschrift: Höchstens 75 Zeichen.")
     }
 }
+
+/// Vertrag 1.2.4: Kalender ohne Lizenz → 403 `unlicensed` (PUT iCal und calendar/check).
+@Suite @MainActor struct CalendarUnlicensedTests {
+    static let unlicensed: [String: Any] = ["error": ["code": "unlicensed", "message": "Keine Berechtigung"]]
+
+    @Test func lizenzfehlerStattKeineBerechtigung() async throws {
+        let transport = SlotEditorTests.makeTransport()
+        transport.on("updateSlot") { _, _ in RoutingStubTransport.json(.forbidden, Self.unlicensed) }
+        transport.on("checkCalendarUrl") { _, _ in RoutingStubTransport.json(.forbidden, Self.unlicensed) }
+        let model = SlotEditorModel(displayId: "d-1", slot: 1, display: nil, client: transport.makeClient(), system: nil)
+        await model.load()
+        model.draft.kind = .calendar
+        model.draft.calendar.url = "https://example.org/k.ics"
+
+        await model.checkCalendar()
+        #expect(model.calendarCheck == .failed(APIError.calendarUnlicensedMessage))
+
+        #expect(await model.save() == nil)
+        #expect(model.saveError?.code == "unlicensed")
+        #expect(model.saveError?.message == APIError.calendarUnlicensedMessage)
+    }
+
+    @Test func allgemeinerLizenzfehler() throws {
+        let data = try JSONSerialization.data(withJSONObject: Self.unlicensed)
+        let response = try JSONDecoder().decode(Components.Schemas.ErrorResponse.self, from: data)
+        #expect(APIError(response, statusCode: 403).message == APIError.unlicensedMessage)
+        #expect(SlotEditorModel.fieldLabel("content.source") == "Quelle")
+    }
+}

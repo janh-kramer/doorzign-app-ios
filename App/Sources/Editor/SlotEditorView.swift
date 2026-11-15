@@ -48,7 +48,9 @@ struct SlotEditorView: View {
                     Section {
                         Text(error.message).foregroundStyle(.red)
                         ForEach(error.fields.sorted(by: { $0.key < $1.key }), id: \.key) { field, messages in
-                            ForEach(messages, id: \.self) { Text($0).font(.caption).foregroundStyle(.red) }
+                            ForEach(messages, id: \.self) {
+                                Text("\(SlotEditorModel.fieldLabel(field)): \($0)").font(.caption).foregroundStyle(.red)
+                            }
                         }
                     }
                 }

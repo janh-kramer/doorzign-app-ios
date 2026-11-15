@@ -20,16 +20,31 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
 
     public var errorDescription: String? { message }
 
+    public static let unlicensedMessage = "Für dieses Display ist keine gültige Lizenz vorhanden."
+    public static let calendarUnlicensedMessage = "Für dieses Display ist keine Kalenderlizenz vorhanden."
+
     public init(_ response: Components.Schemas.ErrorResponse, statusCode: Int?) {
+        // Lizenzfehler (403 `unlicensed`) nicht als „Keine Berechtigung“ anzeigen.
+        let message = response.error.code == "unlicensed" ? Self.unlicensedMessage : response.error.message
         self.init(
             code: response.error.code,
-            message: response.error.message,
+            message: message,
             fields: response.error.fields?.additionalProperties ?? [:],
             statusCode: statusCode
         )
     }
 
     /// Antwort, die der Vertrag nicht vorsieht.
+    /// Gleicher Fehler mit anderem Anzeigetext.
+    public func with(message: String) -> APIError {
+        APIError(code: code, message: message, fields: fields, statusCode: statusCode)
+    }
+
+    /// Kalender-Kontext (PUT iCal, calendar/check): Lizenzfehler konkret benennen.
+    public var forCalendar: APIError {
+        code == "unlicensed" ? with(message: Self.calendarUnlicensedMessage) : self
+    }
+
     public static func unexpected(statusCode: Int) -> APIError {
         switch statusCode {
         case 401: APIError(code: "unauthorized", message: "Bitte erneut anmelden.", statusCode: statusCode)

@@ -188,12 +188,13 @@ public final class SlotEditorModel {
     }
 
     /// `content.headline`, `headline` → „Überschrift“; Unbekanntes bleibt wie geliefert.
-    static func fieldLabel(_ key: String) -> String {
+    public static func fieldLabel(_ key: String) -> String {
         switch key.split(separator: ".").last.map(String.init) ?? key {
         case "title": "Titel"
         case "headline": "Überschrift"
         case "subHeadline": "Unterüberschrift"
         case "message": "Nachricht"
+        case "source": "Quelle"
         default: key
         }
     }
@@ -222,7 +223,8 @@ public final class SlotEditorModel {
             apply(saved)
             return saved
         } catch {
-            saveError = APIError.from(error)
+            let apiError = APIError.from(error)
+            saveError = draft.kind == .calendar ? apiError.forCalendar : apiError
             return nil
         }
     }
@@ -282,7 +284,7 @@ public final class SlotEditorModel {
                 ? .ok(eventCount: result.eventCount)
                 : .failed(result.error ?? "Der Kalender konnte nicht abgerufen werden.")
         } catch {
-            calendarCheck = .failed(APIError.from(error).message)
+            calendarCheck = .failed(APIError.from(error).forCalendar.message)
         }
     }
 
