@@ -97,7 +97,7 @@ public final class SchedulesModel {
             return nil
         case .conflict:
             await load()
-            return APIError(code: "conflict", message: "Der Zeitplan wurde inzwischen geändert. Die Liste wurde neu geladen.", statusCode: 412)
+            return APIError(code: "conflict", message: L("Der Zeitplan wurde inzwischen geändert. Die Liste wurde neu geladen."), statusCode: 412)
         case .failed(let error):
             return error
         }

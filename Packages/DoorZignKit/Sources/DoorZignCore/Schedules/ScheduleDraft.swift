@@ -97,12 +97,12 @@ public struct ScheduleDraft: Equatable, Sendable {
     /// Validierungsfehler (leer = gültig).
     public var problems: [String] {
         var result: [String] = []
-        if weekdays.isEmpty { result.append("Bitte mindestens einen Wochentag wählen.") }
-        if start == end { result.append("Beginn und Ende dürfen nicht gleich sein.") }
-        if !(0...100).contains(priority) { result.append("Die Priorität muss zwischen 0 und 100 liegen.") }
-        if !(1...3).contains(slot) { result.append("Bitte eine Ansicht wählen.") }
+        if weekdays.isEmpty { result.append(L("Bitte mindestens einen Wochentag wählen.")) }
+        if start == end { result.append(L("Beginn und Ende dürfen nicht gleich sein.")) }
+        if !(0...100).contains(priority) { result.append(L("Die Priorität muss zwischen 0 und 100 liegen.")) }
+        if !(1...3).contains(slot) { result.append(L("Bitte eine Ansicht wählen.")) }
         if let validFrom, let validUntil, validUntil < validFrom {
-            result.append("„Gültig bis“ liegt vor „Gültig ab“.")
+            result.append(L("„Gültig bis“ liegt vor „Gültig ab“."))
         }
         return result
     }
@@ -131,8 +131,8 @@ extension ScheduleFormatting {
         let u = until.flatMap(CalendarDay.init)?.displayText
         switch (f, u) {
         case (nil, nil): return nil
-        case (let f?, nil): return "ab \(f)"
-        case (nil, let u?): return "bis \(u)"
+        case (let f?, nil): return L("ab \(f)")
+        case (nil, let u?): return L("bis \(u)")
         case (let f?, let u?): return "\(f) – \(u)"
         }
     }

@@ -18,10 +18,10 @@ public enum BatteryLevel: Equatable, Sendable {
 
     public var label: String {
         switch self {
-        case .critical: "Kritisch"
-        case .low: "Schwach"
-        case .normal: "Normal"
-        case .unknown: "Unbekannt"
+        case .critical: L("Kritisch")
+        case .low: L(key: "battery.low", "Schwach")
+        case .normal: L("Normal")
+        case .unknown: L("Unbekannt")
         }
     }
 }
@@ -41,10 +41,10 @@ public enum SignalQuality: Equatable, Sendable {
 
     public var label: String {
         switch self {
-        case .good: "Gut"
-        case .medium: "Mittel"
-        case .weak: "Schwach"
-        case .unknown: "Unbekannt"
+        case .good: L("Gut")
+        case .medium: L("Mittel")
+        case .weak: L(key: "signal.weak", "Schwach")
+        case .unknown: L("Unbekannt")
         }
     }
 
@@ -67,11 +67,11 @@ public enum DisplayFilter: String, CaseIterable, Identifiable, Sendable {
 
     public var label: String {
         switch self {
-        case .all: "Alle"
-        case .offline: "Offline"
-        case .lowBattery: "Akku schwach"
-        case .error: "Fehler"
-        case .transferring: "Übertragung offen"
+        case .all: L("Alle")
+        case .offline: L("Offline")
+        case .lowBattery: L("Akku schwach")
+        case .error: L("Fehler")
+        case .transferring: L("Übertragung offen")
         }
     }
 

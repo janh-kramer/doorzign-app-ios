@@ -92,9 +92,9 @@ public final class AppSession {
     ) async -> APIError? {
         switch probe.system.compatibility(appVersion: appVersion) {
         case .appUpdateRequired:
-            return APIError(code: "app_update_required", message: "Bitte aktualisiere die App, um dich mit diesem System zu verbinden.")
+            return APIError(code: "app_update_required", message: L("Bitte aktualisiere die App, um dich mit diesem System zu verbinden."))
         case .incompatibleSystem:
-            return APIError(code: "incompatible", message: "Dieses System ist nicht mit der App kompatibel.")
+            return APIError(code: "incompatible", message: L("Dieses System ist nicht mit der App kompatibel."))
         case .compatible:
             break
         }
@@ -275,7 +275,7 @@ public final class AppSession {
         connection = nil
         tokenManager = nil
         try? store.deleteTokens(instanceId: context.profile.instanceId)
-        notice = "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an."
+        notice = L("Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.")
         phase = .starting
         await prepareLogin(profile: context.profile)
         if case .starting = phase { phase = .onboarding }

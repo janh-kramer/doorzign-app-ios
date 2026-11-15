@@ -8,13 +8,13 @@ extension JobStatus {
     /// Bezeichnungen nach ui-spec §7.
     public var label: String {
         switch self {
-        case .pending: "Wartet"
-        case .progress: "Wird übertragen"
-        case .retry: "Neuer Versuch geplant"
-        case .done: "Übertragen"
-        case .failed: "Fehlgeschlagen"
-        case .skipped: "Übersprungen"
-        case .abandoned: "Abgebrochen"
+        case .pending: L("Wartet")
+        case .progress: L("Wird übertragen")
+        case .retry: L("Neuer Versuch geplant")
+        case .done: L("Übertragen")
+        case .failed: L("Fehlgeschlagen")
+        case .skipped: L("Übersprungen")
+        case .abandoned: L("Abgebrochen")
         }
     }
 
@@ -33,11 +33,11 @@ extension Job {
     /// Auftragsart; offene Werteliste, Unbekanntes neutral anzeigen.
     public var typeLabel: String {
         switch _type {
-        case "upload_image": slot.map { "Ansicht \($0) übertragen" } ?? "Inhalt übertragen"
-        case "press_button": slot.map { "Auf Ansicht \($0) umschalten" } ?? "Ansicht umschalten"
-        case "unbind_button": "Ansicht deaktivieren"
-        case "identify": "Display finden"
-        default: "Auftrag"
+        case "upload_image": slot.map { L("Ansicht \($0) übertragen") } ?? L("Inhalt übertragen")
+        case "press_button": slot.map { L("Auf Ansicht \($0) umschalten") } ?? L("Ansicht umschalten")
+        case "unbind_button": L("Ansicht deaktivieren")
+        case "identify": L("Display finden")
+        default: L("Auftrag")
         }
     }
 

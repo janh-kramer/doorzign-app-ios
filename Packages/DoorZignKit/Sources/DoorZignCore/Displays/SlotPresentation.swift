@@ -7,10 +7,10 @@ public typealias SlotContent = Components.Schemas.SlotContent
 extension SlotContent {
     public var typeLabel: String {
         switch self {
-        case .text: "Text"
-        case .image: "Bild"
-        case .calendar(let calendar): calendar.source == .zeitwart ? "Raumanzeige" : "Kalender"
-        case .deactivated: "Deaktiviert"
+        case .text: L("Text")
+        case .image: L("Bild")
+        case .calendar(let calendar): calendar.source == .zeitwart ? L("Raumanzeige") : L("Kalender")
+        case .deactivated: L("Deaktiviert")
         }
     }
 
@@ -36,7 +36,7 @@ extension Slot {
     public func transferStatus(isActive: Bool) -> (label: String, tone: TransferTone) {
         if let transfer, transfer.status.isOpen { return (transfer.status.label, .busy) }
         if let transfer, transfer.status.isFailure { return (transfer.status.label, .failure) }
-        if transferred { return ("Auf dem Display", .neutral) }
-        return isActive ? ("Nicht übertragen", .warning) : ("Wird beim Anzeigen übertragen", .neutral)
+        if transferred { return (L("Auf dem Display"), .neutral) }
+        return isActive ? (L("Nicht übertragen"), .warning) : (L("Wird beim Anzeigen übertragen"), .neutral)
     }
 }

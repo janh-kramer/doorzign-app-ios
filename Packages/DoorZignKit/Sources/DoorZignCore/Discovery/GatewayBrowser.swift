@@ -81,9 +81,9 @@ public final class GatewayBrowser {
 
     private static func describe(_ error: NWError) -> String {
         if case .dns(let code) = error, code == -65570 /* kDNSServiceErr_PolicyDenied */ {
-            return "Kein Zugriff auf das lokale Netzwerk. Bitte in den Einstellungen unter „DoorZign“ erlauben."
+            return L("Kein Zugriff auf das lokale Netzwerk. Bitte in den Einstellungen unter „DoorZign“ erlauben.")
         }
-        return "Suche im Netzwerk nicht möglich (\(error.localizedDescription))."
+        return L("Suche im Netzwerk nicht möglich (\(error.localizedDescription)).")
     }
 
     nonisolated static func gateway(from result: NWBrowser.Result) -> DiscoveredGateway? {

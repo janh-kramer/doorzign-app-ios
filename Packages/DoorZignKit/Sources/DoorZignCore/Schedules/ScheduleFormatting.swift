@@ -1,14 +1,18 @@
 import Foundation
 
 public enum ScheduleFormatting {
-    public static let abbreviations = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+    public static var abbreviations: [String] {
+        [L(key: "weekday.short.1", "Mo"), L(key: "weekday.short.2", "Di"), L(key: "weekday.short.3", "Mi"),
+         L(key: "weekday.short.4", "Do"), L(key: "weekday.short.5", "Fr"), L(key: "weekday.short.6", "Sa"),
+         L(key: "weekday.short.7", "So")]
+    }
 
     /// Wochentage (1 = Montag … 7 = Sonntag) kompakt: `[1,2,3,4,5]` → „Mo–Fr“, `[1,3,5]` → „Mo, Mi, Fr“,
     /// alle sieben → „Täglich“. Folgen ab drei Tagen werden zusammengefasst.
     public static func weekdays(_ days: [Int]) -> String {
         let sorted = Array(Set(days.filter { (1...7).contains($0) })).sorted()
         guard !sorted.isEmpty else { return "–" }
-        if sorted.count == 7 { return "Täglich" }
+        if sorted.count == 7 { return L("Täglich") }
         var parts: [String] = []
         var runStart = sorted[0]
         var previous = sorted[0]
@@ -35,6 +39,6 @@ public enum ScheduleFormatting {
 
     /// Zeitfenster `start`–`end`; Ende vor Start bedeutet „über Mitternacht“.
     public static func timeRange(start: String, end: String) -> String {
-        end < start ? "\(start)–\(end) Uhr (über Mitternacht)" : "\(start)–\(end) Uhr"
+        end < start ? L("\(start)–\(end) Uhr (über Mitternacht)") : L("\(start)–\(end) Uhr")
     }
 }

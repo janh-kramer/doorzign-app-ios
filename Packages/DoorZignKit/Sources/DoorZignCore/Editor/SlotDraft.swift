@@ -13,10 +13,10 @@ public struct SlotDraft: Equatable, Sendable {
 
         public var label: String {
             switch self {
-            case .text: "Text"
-            case .image: "Bild"
-            case .calendar: "Kalender"
-            case .deactivated: "Deaktiviert"
+            case .text: L("Text")
+            case .image: L("Bild")
+            case .calendar: L("Kalender")
+            case .deactivated: L("Deaktiviert")
             }
         }
     }
@@ -43,8 +43,8 @@ public struct SlotDraft: Equatable, Sendable {
 
         /// Felder über dem Vertragslimit (Edge-Web erlaubt längere Texte) mit Länge und Limit.
         public var tooLongFields: [(name: String, count: Int, limit: Int)] {
-            [("Titel", title, Self.limits.title), ("Überschrift", headline, Self.limits.headline),
-             ("Unterüberschrift", subHeadline, Self.limits.subHeadline), ("Nachricht", message, Self.limits.message)]
+            [(L("Titel"), title, Self.limits.title), (L("Überschrift"), headline, Self.limits.headline),
+             (L("Unterüberschrift"), subHeadline, Self.limits.subHeadline), (L("Nachricht"), message, Self.limits.message)]
                 .filter { $0.1.count > $0.2 }
                 .map { (name: $0.0, count: $0.1.count, limit: $0.2) }
         }
@@ -178,13 +178,11 @@ public struct SlotDraft: Equatable, Sendable {
         switch kind {
         case .text:
             text.isValid ? nil
-                : "Zu lang zum Speichern: "
-                    + text.tooLongFields.map { "\($0.name) (\($0.count)/\($0.limit))" }.joined(separator: ", ")
-                    + ". Bitte kürzen."
-        case .image: image.mediaId == nil ? "Bitte ein Bild auswählen." : nil
+                : L("Zu lang zum Speichern: \(text.tooLongFields.map { "\($0.name) (\($0.count)/\($0.limit))" }.joined(separator: ", ")). Bitte kürzen.")
+        case .image: image.mediaId == nil ? L("Bitte ein Bild auswählen.") : nil
         case .calendar:
-            calendar.source == .zeitwart ? "Wird in Zeitwart konfiguriert."
-                : calendar.isValidURL ? nil : "Bitte eine gültige Kalender-URL eingeben."
+            calendar.source == .zeitwart ? L("Wird in Zeitwart konfiguriert.")
+                : calendar.isValidURL ? nil : L("Bitte eine gültige Kalender-URL eingeben.")
         case .deactivated: nil
         }
     }

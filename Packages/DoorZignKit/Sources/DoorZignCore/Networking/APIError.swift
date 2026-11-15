@@ -20,8 +20,8 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
 
     public var errorDescription: String? { message }
 
-    public static let unlicensedMessage = "Für dieses Display ist keine gültige Lizenz vorhanden."
-    public static let calendarUnlicensedMessage = "Für dieses Display ist keine Kalenderlizenz vorhanden."
+    public static var unlicensedMessage: String { L("Für dieses Display ist keine gültige Lizenz vorhanden.") }
+    public static var calendarUnlicensedMessage: String { L("Für dieses Display ist keine Kalenderlizenz vorhanden.") }
 
     public init(_ response: Components.Schemas.ErrorResponse, statusCode: Int?) {
         // Lizenzfehler (403 `unlicensed`) nicht als „Keine Berechtigung“ anzeigen.
@@ -47,13 +47,13 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
 
     public static func unexpected(statusCode: Int) -> APIError {
         switch statusCode {
-        case 401: APIError(code: "unauthorized", message: "Bitte erneut anmelden.", statusCode: statusCode)
-        case 403: APIError(code: "forbidden", message: "Dafür fehlt die Berechtigung.", statusCode: statusCode)
-        case 404: APIError(code: "not_found", message: "Nicht gefunden.", statusCode: statusCode)
-        case 429: APIError(code: "rate_limited", message: "Zu viele Versuche. Bitte später erneut versuchen.", statusCode: statusCode)
-        case 503: APIError(code: "unavailable", message: "Das System ist vorübergehend nicht verfügbar. Bitte gleich erneut versuchen.", statusCode: statusCode)
-        case 500...: APIError(code: "unavailable", message: "Das System ist gerade nicht erreichbar (Fehler \(statusCode)).", statusCode: statusCode)
-        default: APIError(code: "unexpected", message: "Unerwartete Antwort vom System (\(statusCode)).", statusCode: statusCode)
+        case 401: APIError(code: "unauthorized", message: L("Bitte erneut anmelden."), statusCode: statusCode)
+        case 403: APIError(code: "forbidden", message: L("Dafür fehlt die Berechtigung."), statusCode: statusCode)
+        case 404: APIError(code: "not_found", message: L("Nicht gefunden."), statusCode: statusCode)
+        case 429: APIError(code: "rate_limited", message: L("Zu viele Versuche. Bitte später erneut versuchen."), statusCode: statusCode)
+        case 503: APIError(code: "unavailable", message: L("Das System ist vorübergehend nicht verfügbar. Bitte gleich erneut versuchen."), statusCode: statusCode)
+        case 500...: APIError(code: "unavailable", message: L("Das System ist gerade nicht erreichbar (Fehler \(statusCode))."), statusCode: statusCode)
+        default: APIError(code: "unexpected", message: L("Unerwartete Antwort vom System (\(statusCode))."), statusCode: statusCode)
         }
     }
 
@@ -61,26 +61,26 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
     public static func from(_ error: Error) -> APIError {
         if let apiError = error as? APIError { return apiError }
         if let authError = error as? AuthError, authError == .notAuthenticated {
-            return APIError(code: "unauthorized", message: "Bitte erneut anmelden.")
+            return APIError(code: "unauthorized", message: L("Bitte erneut anmelden."))
         }
         let underlying = (error as? ClientErrorLike)?.underlyingError ?? error
         if let urlError = underlying as? URLError {
             switch urlError.code {
             case .cancelled:
-                return APIError(code: "cancelled", message: "Abgebrochen.")
+                return APIError(code: "cancelled", message: L("Abgebrochen."))
             case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed:
-                return APIError(code: "offline", message: "Keine Netzwerkverbindung.")
+                return APIError(code: "offline", message: L("Keine Netzwerkverbindung."))
             case .timedOut, .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed:
-                return APIError(code: "unreachable", message: "Das System ist nicht erreichbar.")
+                return APIError(code: "unreachable", message: L("Das System ist nicht erreichbar."))
             case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateNotYetValid,
                  .serverCertificateHasUnknownRoot, .secureConnectionFailed, .clientCertificateRejected:
-                return APIError(code: "tls", message: "Die sichere Verbindung konnte nicht hergestellt werden. Das Zertifikat stimmt nicht mit dem gespeicherten überein.")
+                return APIError(code: "tls", message: L("Die sichere Verbindung konnte nicht hergestellt werden. Das Zertifikat stimmt nicht mit dem gespeicherten überein."))
             default:
                 return APIError(code: "network", message: urlError.localizedDescription)
             }
         }
         if underlying is DecodingError {
-            return APIError(code: "decoding", message: "Die Antwort des Systems ist nicht lesbar. Bitte App aktualisieren.")
+            return APIError(code: "decoding", message: L("Die Antwort des Systems ist nicht lesbar. Bitte App aktualisieren."))
         }
         return APIError(code: "unknown", message: underlying.localizedDescription)
     }

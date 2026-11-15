@@ -10,9 +10,9 @@ public enum JobFilter: String, CaseIterable, Identifiable, Sendable {
 
     public var label: String {
         switch self {
-        case .all: "Alle"
-        case .open: "Offen"
-        case .failed: "Fehlgeschlagen"
+        case .all: L("Alle")
+        case .open: L("Offen")
+        case .failed: L("Fehlgeschlagen")
         }
     }
 
@@ -155,13 +155,13 @@ extension Job {
         }
         guard let code = errorCode, !code.isEmpty else { return nil }
         return switch code {
-        case "transport": "Funkverbindung gestört."
-        case "device_rejected": "Das Display hat den Auftrag abgelehnt."
-        case "unlicensed": "Keine gültige Lizenz."
-        case "not_in_range": "Display außer Reichweite."
-        case "interrupted": "Übertragung unterbrochen."
-        case "render_failed": "Inhalt konnte nicht erzeugt werden."
-        default: "Fehler (\(code))."
+        case "transport": L("Funkverbindung gestört.")
+        case "device_rejected": L("Das Display hat den Auftrag abgelehnt.")
+        case "unlicensed": L("Keine gültige Lizenz.")
+        case "not_in_range": L("Display außer Reichweite.")
+        case "interrupted": L("Übertragung unterbrochen.")
+        case "render_failed": L("Inhalt konnte nicht erzeugt werden.")
+        default: L("Fehler (\(code)).")
         }
     }
 }

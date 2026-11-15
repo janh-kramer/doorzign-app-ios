@@ -22,9 +22,9 @@ public enum ProbeError: Error, Equatable, Sendable, LocalizedError {
         case .unreachable(let error):
             error.message
         case .fingerprintMismatch:
-            "Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „Mobile App verbinden“ erneut scannen."
+            L("Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „Mobile App verbinden“ erneut scannen.")
         case .instanceMismatch:
-            "Unter dieser Adresse antwortet eine andere DoorZign-Installation als im QR-Code angegeben."
+            L("Unter dieser Adresse antwortet eine andere DoorZign-Installation als im QR-Code angegeben.")
         }
     }
 }
@@ -37,7 +37,7 @@ public enum SystemProbe {
         trust: TrustPolicy,
         expectedInstanceId: String? = nil
     ) async throws -> ProbeResult {
-        var lastError = APIError(code: "unreachable", message: "Das System ist nicht erreichbar.")
+        var lastError = APIError(code: "unreachable", message: L("Das System ist nicht erreichbar."))
         for url in urls {
             let connection = ClientFactory.makeConnection(baseURL: url, trust: trust)
             defer { connection.session.finishTasksAndInvalidate() }

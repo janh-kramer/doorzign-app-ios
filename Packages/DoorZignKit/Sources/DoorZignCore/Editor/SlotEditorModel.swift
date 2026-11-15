@@ -142,7 +142,7 @@ public final class SlotEditorModel {
         draft.kind == .text && !draft.text.tooLongFields.isEmpty
     }
 
-    public static let previewAfterShorteningHint = "Vorschau nach dem Kürzen"
+    public static var previewAfterShorteningHint: String { L("Vorschau nach dem Kürzen") }
 
     /// Nach jeder Änderung aufrufen; rendert nach 600 ms Ruhe (`POST …/preview`).
     public func schedulePreview(immediately: Bool = false) {
@@ -183,18 +183,18 @@ public final class SlotEditorModel {
         guard error.statusCode == 422, !error.fields.isEmpty else { return error.message }
         return error.fields.sorted { $0.key < $1.key }.map { key, messages in
             let name = fieldLabel(key)
-            return messages.isEmpty ? "\(name): ungültig." : "\(name): \(messages.joined(separator: " "))"
+            return messages.isEmpty ? L("\(name): ungültig.") : "\(name): \(messages.joined(separator: " "))"
         }.joined(separator: "\n")
     }
 
     /// `content.headline`, `headline` → „Überschrift“; Unbekanntes bleibt wie geliefert.
     public static func fieldLabel(_ key: String) -> String {
         switch key.split(separator: ".").last.map(String.init) ?? key {
-        case "title": "Titel"
-        case "headline": "Überschrift"
-        case "subHeadline": "Unterüberschrift"
-        case "message": "Nachricht"
-        case "source": "Quelle"
+        case "title": L("Titel")
+        case "headline": L("Überschrift")
+        case "subHeadline": L("Unterüberschrift")
+        case "message": L("Nachricht")
+        case "source": L("Quelle")
         default: key
         }
     }
@@ -271,7 +271,7 @@ public final class SlotEditorModel {
     public func checkCalendar() async {
         let url = SlotDraft.Calendar.normalizedURL(draft.calendar.url)
         guard draft.calendar.isValidURL else {
-            calendarCheck = .failed("Bitte eine gültige Kalender-URL eingeben.")
+            calendarCheck = .failed(L("Bitte eine gültige Kalender-URL eingeben."))
             return
         }
         calendarCheck = .running
@@ -282,7 +282,7 @@ public final class SlotEditorModel {
             )) { try $0.ok.body.json }
             calendarCheck = result.ok
                 ? .ok(eventCount: result.eventCount)
-                : .failed(result.error ?? "Der Kalender konnte nicht abgerufen werden.")
+                : .failed(result.error ?? L("Der Kalender konnte nicht abgerufen werden."))
         } catch {
             calendarCheck = .failed(APIError.from(error).forCalendar.message)
         }

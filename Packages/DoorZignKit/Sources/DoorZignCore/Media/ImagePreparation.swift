@@ -24,9 +24,9 @@ public enum ImagePreparation {
         public var errorDescription: String? {
             switch self {
             case .unreadable:
-                "Das Bild konnte nicht gelesen werden."
+                L("Das Bild konnte nicht gelesen werden.")
             case .tooLarge(let maxBytes):
-                "Das Bild ist zu groß (höchstens \(ByteCountFormatter.string(fromByteCount: Int64(maxBytes), countStyle: .file)))."
+                L("Das Bild ist zu groß (höchstens \(ByteCountFormatter.string(fromByteCount: Int64(maxBytes), countStyle: .file))).")
             }
         }
     }

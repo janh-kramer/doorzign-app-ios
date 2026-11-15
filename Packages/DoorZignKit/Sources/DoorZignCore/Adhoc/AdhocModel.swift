@@ -98,9 +98,9 @@ public final class AdhocModel {
     public static func label(minutes: Int) -> String {
         let hours = minutes / 60, rest = minutes % 60
         switch (hours, rest) {
-        case (0, _): return "\(rest) Min."
-        case (_, 0): return "\(hours) Std."
-        default: return "\(hours) Std. \(rest) Min."
+        case (0, _): return L("\(rest) Min.")
+        case (_, 0): return L("\(hours) Std.")
+        default: return L("\(hours) Std. \(rest) Min.")
         }
     }
 }
