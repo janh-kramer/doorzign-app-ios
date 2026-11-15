@@ -63,7 +63,6 @@
 "Die Nachricht ersetzt vorübergehend alle Textansichten. Bild- und Kalenderansichten bleiben unverändert." = "The message temporarily replaces all text views. Image and calendar views stay unchanged.";
 "Die gerade angezeigte Ansicht kann nicht deaktiviert werden." = "The view currently shown cannot be deactivated.";
 "Die Änderungen an dieser Ansicht wurden noch nicht gespeichert." = "The changes to this view have not been saved yet.";
-"Diese Ansicht anzeigen" = "Show this view";
 "Diese Ansicht kann in der App nicht bearbeitet werden." = "This view cannot be edited in the app.";
 "Diese Ansicht wird auf dem Display nicht angeboten." = "This view is not offered on the display.";
 "Dieser QR-Code ist kein DoorZign-Verbindungscode." = "This QR code is not a DoorZign connection code.";

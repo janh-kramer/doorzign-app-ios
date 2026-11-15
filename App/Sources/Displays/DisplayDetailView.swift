@@ -10,6 +10,8 @@ struct DisplayDetailView: View {
     @State private var confirmResend = false
     @State private var confirmEndAdhoc = false
     @State private var notice: String?
+    /// Aus dem Menü einer Ansicht geöffneter Editor (Menüeinträge können keinen NavigationLink tragen).
+    @State private var editorRoute: SlotEditorRoute?
 
     init(context: SignedInContext, displayId: String, initial: Display?) {
         self.context = context
@@ -41,7 +43,7 @@ struct DisplayDetailView: View {
                 Task { await model.contentSaved() }
             }
         }
-        .navigationDestination(for: SlotEditorRoute.self) { route in
+        .navigationDestination(item: $editorRoute) { route in
             SlotEditorView(context: context, displayId: route.displayId, slot: route.slot, display: model.display) {
                 Task { await model.contentSaved() }
             }
@@ -112,34 +114,13 @@ struct DisplayDetailView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(model.slots, id: \.slot) { slot in
-                            SlotCard(
-                                slot: slot,
-                                isActive: slot.slot == display.activeSlot,
-                                display: display,
-                                previews: context.previews
-                            )
-                            .contextMenu { slotActions(slot) }
+                            slotCard(slot, display: display)
                         }
                     }
                     .padding(.vertical, 4)
                 }
                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
 
-                ForEach(model.slots.filter(model.canActivate), id: \.slot) { slot in
-                    Button {
-                        run { try await model.activate(slot: slot.slot) } success: { String(localized: "Ansicht \(slot.slot) wird angezeigt.") }
-                    } label: {
-                        Label("Ansicht \(slot.slot) anzeigen", systemImage: "rectangle.portrait.on.rectangle.portrait")
-                    }
-                    .disabled(model.runningAction != nil)
-                }
-                if model.canEdit {
-                    ForEach(model.slots.filter(\.editable), id: \.slot) { slot in
-                        NavigationLink(value: SlotEditorRoute(displayId: display.id, slot: slot.slot)) {
-                            Label("Ansicht \(slot.slot) bearbeiten", systemImage: "pencil")
-                        }
-                    }
-                }
                 if model.canIdentify {
                     Button {
                         run { try await model.identify() } success: { String(localized: "Das Display blinkt gleich.") }
@@ -157,12 +138,42 @@ struct DisplayDetailView: View {
         }
     }
 
+    /// Vorschaukarte einer Ansicht. Tippen öffnet ein Menü: zuerst „anzeigen“, darunter abgesetzt „bearbeiten“.
+    /// Ohne erlaubte Aktion (z. B. aktive Ansicht für Nur-Lesen-Benutzer) bleibt die Karte ein reines Bild.
     @ViewBuilder
-    private func slotActions(_ slot: Slot) -> some View {
-        if model.canActivate(slot) {
-            Button("Diese Ansicht anzeigen", systemImage: "rectangle.portrait.on.rectangle.portrait") {
-                run { try await model.activate(slot: slot.slot) } success: { String(localized: "Ansicht \(slot.slot) wird angezeigt.") }
+    private func slotCard(_ slot: Slot, display: Display) -> some View {
+        let card = SlotCard(
+            slot: slot,
+            isActive: slot.slot == display.activeSlot,
+            display: display,
+            previews: context.previews
+        )
+        let canShow = model.canActivate(slot)
+        let canEditSlot = model.canEdit && slot.editable
+        if canShow || canEditSlot {
+            Menu {
+                if canShow {
+                    Section {
+                        Button("Ansicht \(slot.slot) anzeigen", systemImage: "rectangle.portrait.on.rectangle.portrait") {
+                            run { try await model.activate(slot: slot.slot) } success: { String(localized: "Ansicht \(slot.slot) wird angezeigt.") }
+                        }
+                        .disabled(model.runningAction != nil)
+                    }
+                }
+                if canEditSlot {
+                    Section {
+                        Button("Ansicht \(slot.slot) bearbeiten", systemImage: "pencil") {
+                            editorRoute = SlotEditorRoute(displayId: display.id, slot: slot.slot)
+                        }
+                    }
+                }
+            } label: {
+                card.contentShape(Rectangle())
             }
+            .menuStyle(.button)
+            .buttonStyle(.plain)
+        } else {
+            card
         }
     }
 
