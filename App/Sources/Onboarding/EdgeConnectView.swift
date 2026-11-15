@@ -114,12 +114,12 @@ struct FingerprintConfirmView: View {
                         Button("Vollständig anzeigen") { showFull = true }
                     }
                 } header: {
-                    Text("Zertifikats-Fingerabdruck")
+                    Text("Zertifikats-Fingerprint")
                 } footer: {
-                    Text("Vergleiche den Fingerabdruck mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt.")
+                    Text("Vergleiche den Fingerprint mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt.")
                 }
                 Section {
-                    Button("Stimmt überein – verbinden") {
+                    Button("Vertrauen") {
                         dismiss()
                         Task { await model.confirmTrust(trust, session: session) }
                     }
@@ -127,7 +127,7 @@ struct FingerprintConfirmView: View {
                     Button("Abbrechen", role: .cancel) { dismiss() }
                 }
             }
-            .navigationTitle("Gateway bestätigen")
+            .navigationTitle("Zertifikat bestätigen")
             .navigationBarTitleDisplayMode(.inline)
         }
         .interactiveDismissDisabled()

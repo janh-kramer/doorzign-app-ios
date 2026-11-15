@@ -11,9 +11,15 @@ import Testing
         #expect(ScheduleFormatting.weekdays([]) == "–")
     }
 
-    @Test func zeitfenster() {
-        #expect(ScheduleFormatting.timeRange(start: "08:00", end: "12:00") == "08:00–12:00 Uhr")
-        #expect(ScheduleFormatting.timeRange(start: "22:00", end: "06:00") == "22:00–06:00 Uhr (über Mitternacht)")
+    @Test func zeitfenster() throws {
+        // Uhrzeiten aus der Locale: feste deutsche Locale für reproduzierbare Werte.
+        try CoreL10n.$bundleOverride.withValue(try #require(CoreL10n.bundle(language: "de"))) {
+            // Stundenformat (8:00 bzw. 08:00) kommt aus den CLDR-Daten des Systems.
+            let day = ClockTime(hour: 8, minute: 0).displayText, night = ClockTime(hour: 6, minute: 0).displayText
+            #expect(day.hasSuffix("8:00") && night.hasSuffix("6:00"))
+            #expect(ScheduleFormatting.timeRange(start: "08:00", end: "12:00") == "\(day)–12:00 Uhr")
+            #expect(ScheduleFormatting.timeRange(start: "22:00", end: "06:00") == "22:00–\(night) Uhr (über Mitternacht)")
+        }
     }
 }
 

@@ -64,9 +64,12 @@ import Testing
         #expect(model.error?.fields["content"] == ["Keine Textansicht"])
     }
 
-    @Test func dauerTexte() {
-        #expect(AdhocModel.label(minutes: 45) == "45 Min.")
-        #expect(AdhocModel.label(minutes: 120) == "2 Std.")
-        #expect(AdhocModel.label(minutes: 90) == "1 Std. 30 Min.")
+    @Test func dauerTexte() throws {
+        // Dauer aus der Locale (DateComponentsFormatter, .short).
+        try CoreL10n.$bundleOverride.withValue(try #require(CoreL10n.bundle(language: "de"))) {
+            #expect(AdhocModel.label(minutes: 45) == "45 Min.")
+            #expect(AdhocModel.label(minutes: 120) == "2 Std.")
+            #expect(AdhocModel.label(minutes: 90) == "1 Std., 30 Min.")
+        }
     }
 }

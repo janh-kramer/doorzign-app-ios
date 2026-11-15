@@ -117,7 +117,7 @@ struct JobRow: View {
                     Text(job.doneAt ?? job.updatedAt ?? job.createdAt, format: .relative(presentation: .named))
                 }
                 if let tries = job.tries, tries > 1 {
-                    Text("· \(tries) Versuche")
+                    Text("· Versuche: \(tries)")
                 }
             }
             .font(.caption2)

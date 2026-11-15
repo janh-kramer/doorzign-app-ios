@@ -1,10 +1,10 @@
 import Foundation
 
 public enum ScheduleFormatting {
+    /// Kurze Wochentagsnamen aus der Locale, Montag zuerst (de: „Mo“ … „So“, en: "Mon" … "Sun").
     public static var abbreviations: [String] {
-        [L(key: "weekday.short.1", "Mo"), L(key: "weekday.short.2", "Di"), L(key: "weekday.short.3", "Mi"),
-         L(key: "weekday.short.4", "Do"), L(key: "weekday.short.5", "Fr"), L(key: "weekday.short.6", "Sa"),
-         L(key: "weekday.short.7", "So")]
+        let symbols = CoreL10n.utcCalendar.shortStandaloneWeekdaySymbols  // beginnt mit Sonntag
+        return Array(symbols[1...]) + [symbols[0]]
     }
 
     /// Wochentage (1 = Montag … 7 = Sonntag) kompakt: `[1,2,3,4,5]` → „Mo–Fr“, `[1,3,5]` → „Mo, Mi, Fr“,
@@ -38,7 +38,10 @@ public enum ScheduleFormatting {
     }
 
     /// Zeitfenster `start`–`end`; Ende vor Start bedeutet „über Mitternacht“.
+    /// Uhrzeiten im Format der Locale (de „08:00“, en "8:00 AM").
     public static func timeRange(start: String, end: String) -> String {
-        end < start ? L("\(start)–\(end) Uhr (über Mitternacht)") : L("\(start)–\(end) Uhr")
+        let from = ClockTime(start)?.displayText ?? start
+        let to = ClockTime(end)?.displayText ?? end
+        return end < start ? L("\(from)–\(to) Uhr (über Mitternacht)") : L("\(from)–\(to) Uhr")
     }
 }

@@ -87,9 +87,14 @@ import Testing
         CoreL10n.$bundleOverride.withValue(en) {
             #expect(ScheduleFormatting.weekdays([1, 2, 3, 4, 5]) == "Mon–Fri")
             #expect(ScheduleFormatting.weekdays(Array(1...7)) == "Daily")
-            #expect(ScheduleFormatting.timeRange(start: "22:00", end: "06:00") == "22:00–06:00 (overnight)")
+            // 12-Stunden-Format; vor AM/PM steht ein schmales geschütztes Leerzeichen (U+202F).
+            #expect(ScheduleFormatting.timeRange(start: "22:00", end: "06:00").replacingOccurrences(of: "\u{202F}", with: " ")
+                    == "10:00 PM–6:00 AM (overnight)")
             #expect(ScheduleFormatting.validity(from: "2026-12-01", until: nil)?.hasPrefix("from ") == true)
-            #expect(AdhocModel.label(minutes: 90) == "1 h 30 min")
+            #expect(AdhocModel.label(minutes: 90) == "1 hr, 30 min")
+            #expect(ScheduleFormatting.validity(from: "2026-12-01", until: nil) == "from 12/01/2026")
+            #expect(JobStatus.done.label == "Done")
+            #expect(APIError.localizedMessage(code: "internal") == "Internal server error. Please try again later.")
             #expect(APIError.unexpected(statusCode: 502).message == "The system is currently unreachable (error 502).")
             #expect(APIError.calendarUnlicensedMessage == "There is no calendar license for this display.")
             #expect(SlotDraft.Kind.image.label == "Image")
@@ -104,7 +109,10 @@ import Testing
         let de = try #require(CoreL10n.bundle(language: "de"))
         CoreL10n.$bundleOverride.withValue(de) {
             #expect(ScheduleFormatting.weekdays([1, 2, 3, 4, 5]) == "Mo–Fr")
-            #expect(AdhocModel.label(minutes: 90) == "1 Std. 30 Min.")
+            #expect(AdhocModel.label(minutes: 90) == "1 Std., 30 Min.")
+            #expect(ScheduleFormatting.timeRange(start: "08:00", end: "12:00").hasSuffix("8:00–12:00 Uhr"))
+            #expect(ScheduleFormatting.validity(from: "2026-12-01", until: nil) == "ab 01.12.2026")
+            #expect(JobStatus.done.label == "Erledigt")
             #expect(APIError.unexpected(statusCode: 502).message == "Das System ist gerade nicht erreichbar (Fehler 502).")
         }
     }
@@ -121,7 +129,7 @@ import Testing
         let en = try #require(CoreL10n.bundle(language: "en"))
         try CoreL10n.$bundleOverride.withValue(en) {
             for code in ["unauthorized", "token_expired", "forbidden", "not_found", "unlicensed", "precondition_failed",
-                         "too_large", "rate_limited", "unavailable", "conflict"] {
+                         "too_large", "rate_limited", "unavailable", "conflict", "internal"] {
                 let error = APIError(try Self.response(code, "Deutscher Servertext"), statusCode: nil)
                 #expect(error.message != "Deutscher Servertext", "\(code)")
                 #expect(error.code == code)
@@ -132,7 +140,7 @@ import Testing
             #expect(APIError(try Self.response("invalid_grant", "Code ungültig"), statusCode: 400).message == "Code ungültig")
             // Anmeldung: 401 = falsche Zugangsdaten.
             #expect(APIError(try Self.response("unauthorized", "x"), statusCode: 401).forLogin.message
-                    == "The username or password is incorrect.")
+                    == "Incorrect username or password.")
         }
     }
 

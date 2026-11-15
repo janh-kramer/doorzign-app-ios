@@ -56,7 +56,8 @@ In Debug-Builds gibt es im Willkommensbildschirm „Entwicklung: Mock-Server“ 
 im Simulator `http://localhost:4010`, auf Geräten die IP des Macs).
 
 ## Sprachen
-Deutsch ist Quellsprache: Der deutsche Text ist zugleich der Schlüssel. Englisch (Entwurf, mit Android abzustimmen) liegt in
+Deutsch ist Quellsprache: Der deutsche Text ist zugleich der Schlüssel. Begriffe nach `doorzign-app-coordination/docs/glossary.md`
+(festgelegt, Freigabe der Texte durch Jan ausstehend). Wochentage, Dauer, Uhrzeit und Datum kommen aus der Locale. Englisch liegt in
 - `Packages/DoorZignKit/Sources/DoorZignCore/Resources/en.lproj/Localizable.strings` (Texte aus DoorZignCore, `L("…")`;
   `LocalizationTests` prüft, dass jeder Schlüssel übersetzt ist),
 - `App/Resources/en.lproj/Localizable.strings` (SwiftUI-Texte) und `InfoPlist.strings` (Berechtigungstexte).

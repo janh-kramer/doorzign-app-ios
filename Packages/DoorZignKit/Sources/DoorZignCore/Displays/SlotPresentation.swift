@@ -36,7 +36,7 @@ extension Slot {
     public func transferStatus(isActive: Bool) -> (label: String, tone: TransferTone) {
         if let transfer, transfer.status.isOpen { return (transfer.status.label, .busy) }
         if let transfer, transfer.status.isFailure { return (transfer.status.label, .failure) }
-        if transferred { return (L("Auf dem Display"), .neutral) }
-        return isActive ? (L("Nicht übertragen"), .warning) : (L("Wird beim Anzeigen übertragen"), .neutral)
+        if transferred { return (L("Übertragen"), .neutral) }
+        return isActive ? (L("Noch nicht übertragen"), .warning) : (L("Wird beim Anzeigen übertragen"), .neutral)
     }
 }

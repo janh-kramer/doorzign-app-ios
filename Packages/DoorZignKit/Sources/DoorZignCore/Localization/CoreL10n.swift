@@ -20,6 +20,22 @@ public enum CoreL10n {
         from: Bundle.module.localizations, forPreferences: Locale.preferredLanguages
     ).first ?? "de"
 
+    /// Locale für Datum, Uhrzeit, Wochentage und Dauer: Gerät, bzw. die Sprache des Test-Overrides.
+    public static var locale: Locale {
+        guard let bundleOverride else { return .current }
+        // Tests: feste Region, damit Formate reproduzierbar sind.
+        let language = bundleOverride.bundleURL.deletingPathExtension().lastPathComponent
+        return Locale(identifier: ["de": "de_DE", "en": "en_US"][language] ?? language)
+    }
+
+    /// Gregorianischer Kalender in UTC mit `locale` – für Werte ohne Zeitzone (`HH:MM`, `YYYY-MM-DD`).
+    static var utcCalendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        calendar.locale = locale
+        return calendar
+    }
+
     /// Bundle einer einzelnen Sprache (für Tests).
     public static func bundle(language: String) -> Bundle? {
         Bundle.module.path(forResource: language, ofType: "lproj").flatMap(Bundle.init(path:))

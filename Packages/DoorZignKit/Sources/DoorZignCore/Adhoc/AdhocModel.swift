@@ -94,13 +94,12 @@ public final class AdhocModel {
         }
     }
 
-    /// Dauer lesbar: 90 → „1 Std. 30 Min.“.
+    /// Dauer lesbar aus der Locale: 90 → de „1 Std., 30 Min.“, en "1 hr, 30 min".
     public static func label(minutes: Int) -> String {
-        let hours = minutes / 60, rest = minutes % 60
-        switch (hours, rest) {
-        case (0, _): return L("\(rest) Min.")
-        case (_, 0): return L("\(hours) Std.")
-        default: return L("\(hours) Std. \(rest) Min.")
-        }
+        let formatter = DateComponentsFormatter()
+        formatter.calendar = CoreL10n.utcCalendar
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .short
+        return formatter.string(from: TimeInterval(minutes * 60)) ?? "\(minutes)"
     }
 }

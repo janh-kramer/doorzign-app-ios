@@ -44,11 +44,12 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
         case "forbidden": L("Dafür fehlt die Berechtigung.")
         case "not_found": L("Nicht gefunden.")
         case "unlicensed": unlicensedMessage
-        case "precondition_failed": L("Inzwischen von jemand anderem geändert. Bitte neu laden.")
+        case "precondition_failed": L("Inzwischen geändert. Bitte neu laden.")
         case "too_large": L("Die Datei ist zu groß.")
         case "rate_limited": L("Zu viele Versuche. Bitte später erneut versuchen.")
         case "unavailable": L("Das System ist vorübergehend nicht verfügbar. Bitte gleich erneut versuchen.")
         case "conflict": L("Das System ist gerade beschäftigt. Bitte erneut versuchen.")
+        case "internal": L("Interner Serverfehler. Bitte später erneut versuchen.")
         default: nil
         }
     }

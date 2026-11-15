@@ -130,7 +130,7 @@ struct SchedulesView: View {
             if model.togglingIds.contains(schedule.id) {
                 ProgressView()
             } else {
-                Toggle("Aktiv", isOn: Binding(
+                Toggle("Aktiviert", isOn: Binding(
                     get: { schedule.enabled },
                     set: { newValue in
                         Task {

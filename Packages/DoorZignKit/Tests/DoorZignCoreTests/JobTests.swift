@@ -34,7 +34,7 @@ import Testing
     @Test func inaktivNichtUebertragenIstKeinFehler() {
         #expect(Self.slot(transferred: false).transferStatus(isActive: false).tone == .neutral)
         #expect(Self.slot(transferred: false).transferStatus(isActive: true).tone == .warning)
-        #expect(Self.slot(transferred: true).transferStatus(isActive: true).label == "Auf dem Display")
+        #expect(Self.slot(transferred: true).transferStatus(isActive: true).label == "Übertragen")
         let failed = Job(id: "j", displayId: "d", _type: "upload_image", status: .failed, createdAt: Date())
         #expect(Self.slot(transferred: false, transfer: failed).transferStatus(isActive: false).tone == .failure)
     }

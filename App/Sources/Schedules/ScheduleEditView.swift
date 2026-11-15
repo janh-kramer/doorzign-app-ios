@@ -36,7 +36,7 @@ struct ScheduleEditView: View {
                 Picker("Ansicht", selection: $draft.slot) {
                     ForEach(1...3, id: \.self) { Text("Ansicht \($0)").tag($0) }
                 }
-                Toggle("Aktiv", isOn: $draft.enabled)
+                Toggle("Aktiviert", isOn: $draft.enabled)
             }
 
             Section {
@@ -48,7 +48,7 @@ struct ScheduleEditView: View {
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
                     if draft.crossesMidnight {
-                        Label("Läuft über Mitternacht bis \(draft.end.text) am Folgetag.", systemImage: "moon.stars")
+                        Label("Läuft über Mitternacht bis \(draft.end.displayText) am Folgetag.", systemImage: "moon.stars")
                     }
                     if let zoneId = display?.timezone, let zone = TimeZone(identifier: zoneId),
                        zone.identifier != TimeZone.current.identifier {
@@ -103,7 +103,7 @@ struct ScheduleEditView: View {
         .confirmationDialog("Änderungen verwerfen?", isPresented: $confirmDiscard, titleVisibility: .visible) {
             Button("Verwerfen", role: .destructive) { dismiss() }
         }
-        .alert("Inzwischen von jemand anderem geändert", isPresented: $hasConflict) {
+        .alert("Inzwischen geändert", isPresented: $hasConflict) {
             Button("Neu laden") {
                 Task { await model.load(); dismiss() }
             }

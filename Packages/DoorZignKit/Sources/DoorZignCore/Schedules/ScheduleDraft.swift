@@ -23,6 +23,14 @@ public struct ClockTime: Equatable, Comparable, Hashable, Sendable {
 
     public var text: String { String(format: "%02d:%02d", hour, minute) }
 
+    /// Uhrzeit im Format der Locale (de „08:00“, en "8:00 AM").
+    public var displayText: String {
+        let calendar = CoreL10n.utcCalendar
+        var style = Date.FormatStyle(date: .omitted, time: .shortened, locale: CoreL10n.locale, calendar: calendar)
+        style.timeZone = calendar.timeZone
+        return date(in: calendar).formatted(style)
+    }
+
     public static func < (lhs: Self, rhs: Self) -> Bool { (lhs.hour, lhs.minute) < (rhs.hour, rhs.minute) }
 
     /// Für DatePicker: Datum im angegebenen Kalender mit dieser Uhrzeit (das Datum selbst ist bedeutungslos).
@@ -53,9 +61,8 @@ public struct CalendarDay: Equatable, Comparable, Hashable, Sendable {
     public var text: String { String(format: "%04d-%02d-%02d", year, month, day) }
     /// Kurzes Datum in der Sprache des Geräts, z. B. „01.12.2026“ bzw. „12/01/2026“.
     public var displayText: String {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "UTC")!
-        var style = Date.FormatStyle.dateTime.day(.twoDigits).month(.twoDigits).year()
+        let calendar = CoreL10n.utcCalendar
+        var style = Date.FormatStyle.dateTime.day(.twoDigits).month(.twoDigits).year().locale(CoreL10n.locale)
         style.calendar = calendar
         style.timeZone = calendar.timeZone
         return date(in: calendar).formatted(style)
