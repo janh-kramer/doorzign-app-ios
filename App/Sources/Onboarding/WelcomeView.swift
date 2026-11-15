@@ -86,6 +86,7 @@ private struct SystemCard: View {
                 Text(title).font(.headline)
                 Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
             }
+            .multilineTextAlignment(.leading)
             Spacer()
             Image(systemName: "chevron.right").foregroundStyle(.tertiary)
         }

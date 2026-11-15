@@ -100,13 +100,15 @@ struct QRScannerView: UIViewControllerRepresentable {
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
             didScan = false
-            let session = captureSession
+            // AVCaptureSession ist nicht Sendable, start/stop auf der seriellen sessionQueue ist aber Apples Vorgabe.
+            nonisolated(unsafe) let session = captureSession
             sessionQueue.async { if !session.isRunning { session.startRunning() } }
         }
 
         override func viewWillDisappear(_ animated: Bool) {
             super.viewWillDisappear(animated)
-            let session = captureSession
+            // AVCaptureSession ist nicht Sendable, start/stop auf der seriellen sessionQueue ist aber Apples Vorgabe.
+            nonisolated(unsafe) let session = captureSession
             sessionQueue.async { if session.isRunning { session.stopRunning() } }
         }
 
