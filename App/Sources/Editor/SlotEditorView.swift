@@ -125,19 +125,29 @@ struct SlotEditorView: View {
                 RoundedRectangle(cornerRadius: 8).fill(Color.white)
                 if let png = model.previewPNG, let image = UIImage(data: png) {
                     Image(uiImage: image).resizable().interpolation(.none).scaledToFit()
+                        .opacity(model.isPreviewBlockedByLength ? 0.35 : 1)
+                    if model.isPreviewBlockedByLength {
+                        PreviewBlockedLabel()
+                            .padding(8)
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    }
+                } else if model.isPreviewBlockedByLength {
+                    PreviewBlockedLabel()
                 } else if model.previewError == nil {
                     ProgressView()
                 } else {
                     Image(systemName: "eye.slash").foregroundStyle(.tertiary)
                 }
-                if model.isRenderingPreview && model.previewPNG != nil {
+                if model.isRenderingPreview && model.previewPNG != nil && !model.isPreviewBlockedByLength {
                     ProgressView().padding(8).background(.regularMaterial, in: Circle())
                 }
             }
             .aspectRatio(4 / 3, contentMode: .fit)
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(.quaternary))
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-            if let error = model.previewError {
+            if let reason = model.draft.incompleteReason, model.isPreviewBlockedByLength {
+                Text(reason).font(.caption).foregroundStyle(.red)
+            } else if let error = model.previewError {
                 Text(error).font(.caption).foregroundStyle(.secondary)
             } else if let reason = model.draft.incompleteReason {
                 Text(reason).font(.caption).foregroundStyle(.secondary)
@@ -273,5 +283,14 @@ struct SlotEditorView: View {
                 Text("Diese Ansicht kann in der App nicht bearbeitet werden.").foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+/// Platzhalter bzw. Overlay, solange ein Textfeld zu lang ist.
+private struct PreviewBlockedLabel: View {
+    var body: some View {
+        Label(SlotEditorModel.previewAfterShorteningHint, systemImage: "scissors")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
     }
 }

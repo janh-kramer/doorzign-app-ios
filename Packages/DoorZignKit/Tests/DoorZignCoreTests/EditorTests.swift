@@ -290,3 +290,43 @@ final class RoutingStubTransport: ClientTransport, @unchecked Sendable {
         #expect(SlotDraft.Text.limitedInput(String(long.dropLast(10)), previous: long, limit: 75).count == 150)
     }
 }
+
+/// Vorschau bei Überlänge: kein Request, letzte gültige Vorschau bleibt; 422 → Feldhinweis.
+@Suite @MainActor struct OverlongPreviewTests {
+    @Test func keinPreviewRequestBeiUeberlaenge() async throws {
+        let transport = SlotEditorTests.makeTransport()
+        let model = SlotEditorModel(displayId: "d-1", slot: 2, display: nil, client: transport.makeClient(), system: nil)
+        await model.load()
+        try await Task.sleep(for: .milliseconds(100))
+        let afterLoad = transport.requests("renderSlotPreview").count
+        let lastValid = try #require(model.previewPNG)
+
+        model.draft.text.headline = String(repeating: "H", count: 160)
+        model.schedulePreview(immediately: true)
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(model.isPreviewBlockedByLength)
+        #expect(transport.requests("renderSlotPreview").count == afterLoad)
+        #expect(model.previewPNG == lastValid)
+
+        // Nach dem Kürzen wird wieder gerendert.
+        model.draft.text.headline = "Kurz"
+        model.schedulePreview(immediately: true)
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(!model.isPreviewBlockedByLength)
+        #expect(transport.requests("renderSlotPreview").count == afterLoad + 1)
+    }
+
+    @Test func fehler422ZeigtFeldhinweis() async throws {
+        let transport = SlotEditorTests.makeTransport()
+        transport.on("renderSlotPreview") { _, _ in
+            RoutingStubTransport.json(.unprocessableContent, ["error": [
+                "code": "validation_failed", "message": "Ungültige Eingabe",
+                "fields": ["content.headline": ["Höchstens 75 Zeichen."]],
+            ]])
+        }
+        let model = SlotEditorModel(displayId: "d-1", slot: 2, display: nil, client: transport.makeClient(), system: nil)
+        await model.load()
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(model.previewError == "Überschrift: Höchstens 75 Zeichen.")
+    }
+}

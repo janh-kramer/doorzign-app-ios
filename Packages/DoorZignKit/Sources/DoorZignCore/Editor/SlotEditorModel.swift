@@ -136,6 +136,14 @@ public final class SlotEditorModel {
 
     // MARK: Live-Vorschau
 
+    /// Ein Textfeld überschreitet das Vertragslimit: kein `POST …/preview` (Backend antwortet 422),
+    /// die zuletzt gültige Vorschau bleibt gedimmt stehen.
+    public var isPreviewBlockedByLength: Bool {
+        draft.kind == .text && !draft.text.tooLongFields.isEmpty
+    }
+
+    public static let previewAfterShorteningHint = "Vorschau nach dem Kürzen"
+
     /// Nach jeder Änderung aufrufen; rendert nach 600 ms Ruhe (`POST …/preview`).
     public func schedulePreview(immediately: Bool = false) {
         previewTask?.cancel()
@@ -165,7 +173,28 @@ public final class SlotEditorModel {
         } catch {
             guard !Task.isCancelled else { return }
             let apiError = APIError.from(error)
-            if apiError.code != "cancelled" { previewError = apiError.message }
+            guard apiError.code != "cancelled" else { return }
+            previewError = Self.previewErrorText(apiError)
+        }
+    }
+
+    /// 422 mit `fields.<feld>`: Hinweis zum betroffenen Feld statt allgemeinem Vorschaufehler.
+    static func previewErrorText(_ error: APIError) -> String {
+        guard error.statusCode == 422, !error.fields.isEmpty else { return error.message }
+        return error.fields.sorted { $0.key < $1.key }.map { key, messages in
+            let name = fieldLabel(key)
+            return messages.isEmpty ? "\(name): ungültig." : "\(name): \(messages.joined(separator: " "))"
+        }.joined(separator: "\n")
+    }
+
+    /// `content.headline`, `headline` → „Überschrift“; Unbekanntes bleibt wie geliefert.
+    static func fieldLabel(_ key: String) -> String {
+        switch key.split(separator: ".").last.map(String.init) ?? key {
+        case "title": "Titel"
+        case "headline": "Überschrift"
+        case "subHeadline": "Unterüberschrift"
+        case "message": "Nachricht"
+        default: key
         }
     }
 
