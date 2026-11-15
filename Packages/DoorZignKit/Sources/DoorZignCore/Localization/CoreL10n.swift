@@ -12,9 +12,13 @@ public enum CoreL10n {
     /// Sprache nach den bevorzugten Sprachen des Benutzers (inkl. App-Sprache aus den iOS-Einstellungen),
     /// unabhängig von der Sprache des Host-Prozesses (Tests).
     static let preferred: Bundle = {
-        let languages = Bundle.preferredLocalizations(from: Bundle.module.localizations, forPreferences: Locale.preferredLanguages)
-        return languages.first.flatMap(bundle(language:)) ?? .module
+        bundle(language: language) ?? .module
     }()
+
+    /// Sprache der Oberfläche als Code (`de` oder `en`), z. B. für `Accept-Language`.
+    public static let language: String = Bundle.preferredLocalizations(
+        from: Bundle.module.localizations, forPreferences: Locale.preferredLanguages
+    ).first ?? "de"
 
     /// Bundle einer einzelnen Sprache (für Tests).
     public static func bundle(language: String) -> Bundle? {

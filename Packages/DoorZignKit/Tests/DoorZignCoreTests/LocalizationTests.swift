@@ -1,4 +1,6 @@
 import DoorZignAPI
+import HTTPTypes
+import OpenAPIRuntime
 import Foundation
 import Testing
 @testable import DoorZignCore
@@ -105,5 +107,43 @@ import Testing
             #expect(AdhocModel.label(minutes: 90) == "1 Std. 30 Min.")
             #expect(APIError.unexpected(statusCode: 502).message == "Das System ist gerade nicht erreichbar (Fehler 502).")
         }
+    }
+}
+
+/// Glossar-Regel: bekannte error.codes mit eigenen Texten, sonst error.message; Accept-Language = Gerätesprache.
+@Suite @MainActor struct ServerMessageTests {
+    static func response(_ code: String, _ message: String) throws -> Components.Schemas.ErrorResponse {
+        let data = try JSONSerialization.data(withJSONObject: ["error": ["code": code, "message": message]])
+        return try JSONDecoder().decode(Components.Schemas.ErrorResponse.self, from: data)
+    }
+
+    @Test func bekannteCodesMitEigenenTexten() throws {
+        let en = try #require(CoreL10n.bundle(language: "en"))
+        try CoreL10n.$bundleOverride.withValue(en) {
+            for code in ["unauthorized", "token_expired", "forbidden", "not_found", "unlicensed", "precondition_failed",
+                         "too_large", "rate_limited", "unavailable", "conflict"] {
+                let error = APIError(try Self.response(code, "Deutscher Servertext"), statusCode: nil)
+                #expect(error.message != "Deutscher Servertext", "\(code)")
+                #expect(error.code == code)
+            }
+            #expect(APIError(try Self.response("forbidden", "x"), statusCode: 403).message == "You don't have permission to do this.")
+            // Validierung und unbekannte Codes: Text des Servers.
+            #expect(APIError(try Self.response("validation", "Feld fehlt"), statusCode: 422).message == "Feld fehlt")
+            #expect(APIError(try Self.response("invalid_grant", "Code ungültig"), statusCode: 400).message == "Code ungültig")
+            // Anmeldung: 401 = falsche Zugangsdaten.
+            #expect(APIError(try Self.response("unauthorized", "x"), statusCode: 401).forLogin.message
+                    == "The username or password is incorrect.")
+        }
+    }
+
+    @Test func acceptLanguageIstGeraetesprache() async throws {
+        #expect(["de", "en"].contains(CoreL10n.language))
+        let transport = RoutingStubTransport()
+        transport.on("getSystem") { _, _ in (HTTPResponse(status: .serviceUnavailable), nil) }
+        let client = Client(serverURL: URL(string: "https://example.invalid/mobile/v1")!, transport: transport,
+                            middlewares: [AcceptLanguageMiddleware()])
+        _ = try? await client.getSystem()
+        let request = try #require(transport.requests("getSystem").first)
+        #expect(request.request.headerFields[.acceptLanguage] == CoreL10n.language)
     }
 }

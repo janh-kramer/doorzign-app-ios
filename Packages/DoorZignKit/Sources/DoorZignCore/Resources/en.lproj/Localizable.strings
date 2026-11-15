@@ -98,3 +98,7 @@
 "Bitte aktualisiere die App, um dich mit diesem System zu verbinden." = "Please update the app to connect to this system.";
 "Dieses System ist nicht mit der App kompatibel." = "This system is not compatible with the app.";
 "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an." = "Your session has expired. Please sign in again.";
+"Inzwischen von jemand anderem geändert. Bitte neu laden." = "Changed by someone else in the meantime. Please reload.";
+"Die Datei ist zu groß." = "The file is too large.";
+"Das System ist gerade beschäftigt. Bitte erneut versuchen." = "The system is busy right now. Please try again.";
+"Benutzername oder Passwort ist falsch." = "The username or password is incorrect.";

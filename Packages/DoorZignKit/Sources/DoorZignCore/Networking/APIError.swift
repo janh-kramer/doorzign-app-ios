@@ -23,9 +23,10 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
     public static var unlicensedMessage: String { L("Für dieses Display ist keine gültige Lizenz vorhanden.") }
     public static var calendarUnlicensedMessage: String { L("Für dieses Display ist keine Kalenderlizenz vorhanden.") }
 
+    /// Bekannte `error.code`s zeigen eigene, übersetzte Texte (Glossar-Regel); `error.message` nur bei
+    /// `validation` und unbekannten Codes (kommt in der Sprache aus `Accept-Language`, sonst Deutsch).
     public init(_ response: Components.Schemas.ErrorResponse, statusCode: Int?) {
-        // Lizenzfehler (403 `unlicensed`) nicht als „Keine Berechtigung“ anzeigen.
-        let message = response.error.code == "unlicensed" ? Self.unlicensedMessage : response.error.message
+        let message = Self.localizedMessage(code: response.error.code) ?? response.error.message
         self.init(
             code: response.error.code,
             message: message,
@@ -35,6 +36,28 @@ public struct APIError: Error, Equatable, Sendable, LocalizedError {
     }
 
     /// Antwort, die der Vertrag nicht vorsieht.
+    /// Eigener Text für bekannte Fehlercodes, `nil` = Text des Servers verwenden.
+    public static func localizedMessage(code: String) -> String? {
+        switch code {
+        case "unauthorized": L("Bitte erneut anmelden.")
+        case "token_expired": L("Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.")
+        case "forbidden": L("Dafür fehlt die Berechtigung.")
+        case "not_found": L("Nicht gefunden.")
+        case "unlicensed": unlicensedMessage
+        case "precondition_failed": L("Inzwischen von jemand anderem geändert. Bitte neu laden.")
+        case "too_large": L("Die Datei ist zu groß.")
+        case "rate_limited": L("Zu viele Versuche. Bitte später erneut versuchen.")
+        case "unavailable": L("Das System ist vorübergehend nicht verfügbar. Bitte gleich erneut versuchen.")
+        case "conflict": L("Das System ist gerade beschäftigt. Bitte erneut versuchen.")
+        default: nil
+        }
+    }
+
+    /// Anmeldung mit Passwort: 401 heißt falsche Zugangsdaten, nicht „erneut anmelden“.
+    public var forLogin: APIError {
+        statusCode == 401 && code == "unauthorized" ? with(message: L("Benutzername oder Passwort ist falsch.")) : self
+    }
+
     /// Gleicher Fehler mit anderem Anzeigetext.
     public func with(message: String) -> APIError {
         APIError(code: code, message: message, fields: fields, statusCode: statusCode)

@@ -160,7 +160,7 @@ public final class AppSession {
         let pair: Components.Schemas.TokenPair
         switch output {
         case .ok(let ok): pair = try ok.body.json
-        case .unauthorized(let r): throw APIError(try r.body.json, statusCode: 401)
+        case .unauthorized(let r): throw APIError(try r.body.json, statusCode: 401).forLogin
         case .unprocessableContent(let r): throw APIError(try r.body.json, statusCode: 422)
         case .tooManyRequests(let r): throw APIError(try r.body.json, statusCode: 429)
         case .default(let status, let r): throw APIError(try r.body.json, statusCode: status)

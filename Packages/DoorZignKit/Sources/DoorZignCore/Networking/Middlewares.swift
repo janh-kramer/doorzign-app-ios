@@ -64,11 +64,11 @@ public struct AuthMiddleware: ClientMiddleware {
     }
 }
 
-/// Sprache der Fehlertexte; Englisch folgt später.
+/// Sprache der Servermeldungen (`error.message`): Gerätesprache, `de` oder `en`.
 public struct AcceptLanguageMiddleware: ClientMiddleware {
     let language: String
 
-    public init(language: String = "de") {
+    public init(language: String = CoreL10n.language) {
         self.language = language
     }
 
