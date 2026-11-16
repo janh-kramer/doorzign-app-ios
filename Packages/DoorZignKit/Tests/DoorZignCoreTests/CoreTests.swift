@@ -40,7 +40,7 @@ import Testing
     }
 
     @Test func fremderLink() {
-        #expect(throws: PairingLink.ParseError.notDoorZign) { try PairingLink.parse("https://example.com") }
+        #expect(throws: PairingLink.ParseError.notDoorzign) { try PairingLink.parse("https://example.com") }
     }
 }
 

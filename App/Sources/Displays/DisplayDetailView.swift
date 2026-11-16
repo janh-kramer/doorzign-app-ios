@@ -165,6 +165,7 @@ struct DisplayDetailView: View {
                         Button("Ansicht \(slot.slot) bearbeiten", systemImage: "pencil") {
                             editorRoute = SlotEditorRoute(displayId: display.id, slot: slot.slot)
                         }
+                        .accessibilityIdentifier("slot.edit")
                     }
                 }
             } label: {
@@ -172,6 +173,7 @@ struct DisplayDetailView: View {
             }
             .menuStyle(.button)
             .buttonStyle(.plain)
+            .accessibilityIdentifier("slot.card.\(slot.slot)")
         } else {
             card
         }
@@ -222,6 +224,7 @@ struct DisplayDetailView: View {
                 NavigationLink(value: AdhocRoute(displayId: display.id)) {
                     Label(model.adhoc == nil ? "Nachricht anzeigen" : "Nachricht ersetzen", systemImage: "text.bubble")
                 }
+                .accessibilityIdentifier("adhoc.open")
             }
         }
     }
@@ -249,6 +252,7 @@ struct DisplayDetailView: View {
             NavigationLink(value: SchedulesRoute(displayId: display.id)) {
                 Text(model.schedules.count > 3 ? "Alle \(model.schedules.count) Zeitpläne" : "Zeitpläne verwalten")
             }
+            .accessibilityIdentifier("schedules.open")
         } header: {
             Text("Zeitpläne")
         } footer: {
@@ -337,7 +341,7 @@ struct DisplayHeader: View {
 
     static func licenseText(_ license: Display.LicensePayload) -> String {
         let name: String = switch license._type {
-        case "doorzign": String(localized: "DoorZign-Lizenz")
+        case "doorzign": String(localized: "Doorzign-Lizenz")
         case "ical_connect": String(localized: "iCal-Connect-Lizenz")
         case "none": String(localized: "Keine Lizenz")
         default: String(localized: "Lizenz")

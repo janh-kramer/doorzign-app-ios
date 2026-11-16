@@ -30,7 +30,7 @@
 "Das System ist gerade nicht erreichbar (Fehler %lld)." = "The system is currently unreachable (error %lld).";
 "Das System ist nicht erreichbar." = "The system cannot be reached.";
 "Das System ist vorübergehend nicht verfügbar. Bitte gleich erneut versuchen." = "The system is temporarily unavailable. Please try again shortly.";
-"Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „DoorZign-App verbinden“ erneut scannen." = "The system's certificate does not match the QR code. Please scan the QR code again in the Edge web interface under “Connect the DoorZign app”.";
+"Das Zertifikat des Systems stimmt nicht mit dem QR-Code überein. Bitte den QR-Code in der Edge-Weboberfläche unter „Doorzign-App verbinden“ erneut scannen." = "The system's certificate does not match the QR code. Please scan the QR code again in the Edge web interface under “Connect the Doorzign app”.";
 "Deaktiviert" = "Deactivated";
 "Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an." = "Your sign-in has expired. Please sign in again.";
 "Der Kalender konnte nicht abgerufen werden." = "The calendar could not be retrieved.";
@@ -60,7 +60,7 @@
 "Interner Serverfehler. Bitte später erneut versuchen." = "Internal server error. Please try again later.";
 "Inzwischen geändert. Bitte neu laden." = "Changed elsewhere. Please reload.";
 "Kalender" = "Calendar";
-"Kein Zugriff auf das lokale Netzwerk. Bitte in den Einstellungen unter „DoorZign“ erlauben." = "No access to the local network. Please allow it in Settings under “DoorZign”.";
+"Kein Zugriff auf das lokale Netzwerk. Bitte in den Einstellungen unter „Doorzign“ erlauben." = "No access to the local network. Please allow it in Settings under “Doorzign”.";
 "Keine Netzwerkverbindung." = "No network connection.";
 "Keine gültige Lizenz." = "No valid license.";
 "Kritisch" = "Critical";
@@ -81,7 +81,7 @@
 "Unbekannt" = "Unknown";
 "Unerwartete Antwort vom System (%lld)." = "Unexpected response from the system (%lld).";
 "Ungültige Antwort der Anmeldung. Bitte erneut versuchen." = "Invalid sign-in response. Please try again.";
-"Unter dieser Adresse antwortet eine andere DoorZign-Installation als im QR-Code angegeben." = "A different DoorZign installation than the one in the QR code responds at this address.";
+"Unter dieser Adresse antwortet eine andere Doorzign-Installation als im QR-Code angegeben." = "A different Doorzign installation than the one in the QR code responds at this address.";
 "Unterüberschrift" = "Subheadline";
 "Vorschau nach dem Kürzen" = "Preview after shortening";
 "Wartet" = "Waiting";

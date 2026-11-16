@@ -1,4 +1,4 @@
-/* DoorZign App – Englisch nach docs/glossary.md (festgelegt 2026-11-15, Freigabe Jan ausstehend). Schlüssel = deutscher Quelltext (SwiftUI: %@ für Strings/Datum, %lld für Int).
+/* Doorzign App – Englisch nach docs/glossary.md (festgelegt 2026-11-15, Freigabe Jan ausstehend). Schlüssel = deutscher Quelltext (SwiftUI: %@ für Strings/Datum, %lld für Int).
    Prüfen: python3 scripts/check-app-strings.py */
 
 "%@, gültig bis %@" = "%@, valid until %@";
@@ -59,28 +59,28 @@
 "Das Gateway „%@“ konnte nicht erreicht werden." = "The gateway “%@” could not be reached.";
 "Datenschutz" = "Privacy policy";
 "Dauer" = "Duration";
-"Den QR-Code findest du in der Edge-Weboberfläche unter „DoorZign-App verbinden“." = "You can find the QR code in the Edge web interface under “Connect the DoorZign app”.";
+"Den QR-Code findest du in der Edge-Weboberfläche unter „Doorzign-App verbinden“." = "You can find the QR code in the Edge web interface under “Connect the Doorzign app”.";
 "Die Nachricht ersetzt vorübergehend alle Textansichten. Bild- und Kalenderansichten bleiben unverändert." = "The message temporarily replaces all text views. Image and calendar views stay unchanged.";
 "Die gerade angezeigte Ansicht kann nicht deaktiviert werden." = "The view currently shown cannot be deactivated.";
 "Die Änderungen an dieser Ansicht wurden noch nicht gespeichert." = "The changes to this view have not been saved yet.";
 "Diese Ansicht kann in der App nicht bearbeitet werden." = "This view cannot be edited in the app.";
 "Diese Ansicht wird auf dem Display nicht angeboten." = "This view is not offered on the display.";
-"Dieser QR-Code ist kein DoorZign-Verbindungscode." = "This QR code is not a DoorZign connection code.";
+"Dieser QR-Code ist kein Doorzign-Verbindungscode." = "This QR code is not a Doorzign connection code.";
 "Dieses Gerät" = "This device";
 "Dir sind noch keine Displays freigegeben." = "No displays have been shared with you yet.";
 "Display" = "Display";
 "Display finden" = "Find display";
 "Displays" = "Displays";
 "Dithering" = "Dithering";
-"DoorZign Edge" = "DoorZign Edge";
-"DoorZign-Lizenz" = "DoorZign license";
+"Doorzign Edge" = "Doorzign Edge";
+"Doorzign-Lizenz" = "Doorzign license";
 "Eine neue Nachricht ersetzt die laufende." = "A new message replaces the current one.";
 "Einpassen" = "Fit";
 "Einstellungen" = "Settings";
 "Einstellungen öffnen" = "Open Settings";
 "Ende" = "End";
 "Entwicklung: Mock-Server" = "Development: mock server";
-"Erlaube DoorZign in den Einstellungen den Zugriff auf die Kamera, um QR-Codes zu scannen." = "Allow DoorZign to access the camera in Settings to scan QR codes.";
+"Erlaube Doorzign in den Einstellungen den Zugriff auf die Kamera, um QR-Codes zu scannen." = "Allow Doorzign to access the camera in Settings to scan QR codes.";
 "Erneut versuchen" = "Try again";
 "Erneut übertragen" = "Transfer again";
 "Es gibt nichts erneut zu übertragen." = "There is nothing to transfer again.";
@@ -188,7 +188,7 @@
 "Verbindung trennen" = "Disconnect";
 "Verbindung über das Internet" = "Connection over the internet";
 "Verbunden mit" = "Connected to";
-"Vergleiche den Fingerprint mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt." = "Compare the fingerprint with the one shown in the Edge web interface under “Connect the DoorZign app”. Only connect if it matches.";
+"Vergleiche den Fingerprint mit der Anzeige in der Edge-Weboberfläche unter „Doorzign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt." = "Compare the fingerprint with the one shown in the Edge web interface under “Connect the Doorzign app”. Only connect if it matches.";
 "Version" = "Version";
 "Vertrauen" = "Trust";
 "Verwerfen" = "Discard";
@@ -199,7 +199,7 @@
 "Weiter" = "Continue";
 "Weitere Aktionen" = "More actions";
 "Weiß" = "White";
-"Willkommen bei DoorZign" = "Welcome to DoorZign";
+"Willkommen bei Doorzign" = "Welcome to Doorzign";
 "Wird erneut übertragen." = "Transferring again.";
 "Wird gestartet …" = "Starting …";
 "Wird hochgeladen …" = "Uploading …";

@@ -31,7 +31,7 @@ struct QRScannerSheet: View {
                     ContentUnavailableView {
                         Label("Kein Kamerazugriff", systemImage: "camera.fill")
                     } description: {
-                        Text("Erlaube DoorZign in den Einstellungen den Zugriff auf die Kamera, um QR-Codes zu scannen.")
+                        Text("Erlaube Doorzign in den Einstellungen den Zugriff auf die Kamera, um QR-Codes zu scannen.")
                     } actions: {
                         Button("Einstellungen öffnen") {
                             if let url = URL(string: UIApplication.openSettingsURLString) {

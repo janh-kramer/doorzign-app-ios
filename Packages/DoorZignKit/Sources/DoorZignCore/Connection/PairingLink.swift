@@ -9,7 +9,7 @@ public enum PairingLink: Equatable, Sendable {
     case cloud(url: URL, name: String?)
 
     public enum ParseError: Error, Equatable {
-        case notDoorZign
+        case notDoorzign
         case missingParameter(String)
         case invalidURL(String)
         case invalidFingerprint
@@ -18,7 +18,7 @@ public enum PairingLink: Equatable, Sendable {
     public static func parse(_ string: String) throws -> PairingLink {
         guard let components = URLComponents(string: string.trimmingCharacters(in: .whitespacesAndNewlines)),
               components.scheme?.lowercased() == "doorzign"
-        else { throw ParseError.notDoorZign }
+        else { throw ParseError.notDoorzign }
 
         let query = Dictionary(
             (components.queryItems ?? []).map { ($0.name, $0.value ?? "") },
@@ -52,7 +52,7 @@ public enum PairingLink: Equatable, Sendable {
             return .cloud(url: APIBase.mobileBase(url), name: name)
 
         default:
-            throw ParseError.notDoorZign
+            throw ParseError.notDoorzign
         }
     }
 }

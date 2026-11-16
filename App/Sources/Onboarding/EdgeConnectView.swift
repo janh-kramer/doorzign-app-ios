@@ -20,7 +20,7 @@ struct EdgeConnectView: View {
                         .font(.headline)
                 }
             } footer: {
-                Text("Den QR-Code findest du in der Edge-Weboberfläche unter „DoorZign-App verbinden“.")
+                Text("Den QR-Code findest du in der Edge-Weboberfläche unter „Doorzign-App verbinden“.")
             }
 
             ErrorSection(message: model.errorMessage)
@@ -68,7 +68,7 @@ struct EdgeConnectView: View {
                 Text("Host oder IP-Adresse, optional mit Port (Standard 8443).")
             }
         }
-        .navigationTitle("DoorZign Edge")
+        .navigationTitle("Doorzign Edge")
         .onAppear { search.start() }
         .onDisappear { search.stop() }
         .sheet(isPresented: $showScanner) {
@@ -116,7 +116,7 @@ struct FingerprintConfirmView: View {
                 } header: {
                     Text("Zertifikats-Fingerprint")
                 } footer: {
-                    Text("Vergleiche den Fingerprint mit der Anzeige in der Edge-Weboberfläche unter „DoorZign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt.")
+                    Text("Vergleiche den Fingerprint mit der Anzeige in der Edge-Weboberfläche unter „Doorzign-App verbinden“. Verbinde dich nur, wenn er übereinstimmt.")
                 }
                 Section {
                     Button("Vertrauen") {

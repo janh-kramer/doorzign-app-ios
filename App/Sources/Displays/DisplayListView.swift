@@ -26,6 +26,7 @@ struct DisplayListView: View {
                 NavigationLink(value: display.id) {
                     DisplayRow(display: display, previews: context.previews)
                 }
+                .accessibilityIdentifier("display.row")
             }
         }
         .listStyle(.plain)

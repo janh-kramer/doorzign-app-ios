@@ -42,6 +42,16 @@ struct RootView: View {
             guard let link = try? PairingLink.parse(url.absoluteString) else { return }
             onboarding.pendingLink = link
         }
+        #if DEBUG
+        // UI-Tests/Screenshots: Verbindungslink per Startargument `-DZPairingLink <url>`,
+        // ohne Systemdialog „In Doorzign öffnen?“.
+        .task {
+            if let text = UserDefaults.standard.string(forKey: "DZPairingLink"),
+               let link = try? PairingLink.parse(text) {
+                onboarding.pendingLink = link
+            }
+        }
+        #endif
         .alert(
             "Hinweis",
             isPresented: Binding(get: { session.notice != nil }, set: { if !$0 { session.notice = nil } }),

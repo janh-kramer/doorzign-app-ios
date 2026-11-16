@@ -40,7 +40,7 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        CFBundleDisplayName: DoorZign
+        CFBundleDisplayName: Doorzign
         CFBundleDevelopmentRegion: de
         CFBundleLocalizations: [de, en]
         UILaunchScreen: {}
@@ -51,7 +51,7 @@ targets:
            UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         NSCameraUsageDescription: Die Kamera wird zum Scannen des Verbindungs-QR-Codes und für Fotos auf den Displays verwendet.
         NSPhotoLibraryUsageDescription: Fotos aus der Mediathek können als Bild auf einem Display angezeigt werden.
-        NSLocalNetworkUsageDescription: DoorZign sucht im lokalen Netzwerk nach DoorZign-Edge-Gateways und verbindet sich mit ihnen.
+        NSLocalNetworkUsageDescription: Doorzign sucht im lokalen Netzwerk nach Doorzign-Edge-Gateways und verbindet sich mit ihnen.
         NSBonjourServices: [_doorzign._tcp]
         CFBundleURLTypes:
           - CFBundleURLName: de.doorzign.app
@@ -62,3 +62,26 @@ targets:
           # (Edge im LAN) sowie den Prism-Mock über http://localhost:4010. IP-Literale sind ohnehin von ATS ausgenommen.
           # Vertrauen/Pinning prüft unabhängig davon der PinningSessionDelegate (gepinnte Edge-CA).
           NSAllowsLocalNetworking: true
+  DoorZignUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - App/UITests
+    dependencies:
+      - target: DoorZign
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.doorzign.app.uitests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  DoorZign:
+    build:
+      targets:
+        DoorZign: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - DoorZignUITests
+

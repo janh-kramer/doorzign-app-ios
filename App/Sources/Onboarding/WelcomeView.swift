@@ -24,7 +24,7 @@ struct WelcomeView: View {
                         .font(.system(size: 56))
                         .foregroundStyle(.tint)
                         .padding(.top, 32)
-                    Text("Willkommen bei DoorZign")
+                    Text("Willkommen bei Doorzign")
                         .font(.title.bold())
                     Text("Mit welchem System möchtest du dich verbinden?")
                         .foregroundStyle(.secondary)
@@ -33,7 +33,7 @@ struct WelcomeView: View {
                     NavigationLink(value: Route.edge) {
                         SystemCard(
                             icon: "server.rack",
-                            title: "DoorZign Edge",
+                            title: "Doorzign Edge",
                             subtitle: "Lokale Installation über WLAN oder VPN"
                         )
                     }

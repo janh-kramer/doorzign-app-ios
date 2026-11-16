@@ -20,7 +20,7 @@ STRINGS = os.path.join(ROOT, "App", "Resources", "en.lproj", "Localizable.string
 # Kontexte, in denen Literale keine UI-Texte sind.
 SKIP_CONTEXT = re.compile(
     r"(systemImage|systemName|forInfoDictionaryKey|label|identifier|code|string|forKey): $|URL\(string: $|fields\[$|case $|"
-    r"\.tag\($|== $|!= $|contains\($"
+    r"\.tag\($|== $|!= $|contains\($|accessibilityIdentifier\($"
 )
 # Literale ohne Übersetzungsbedarf (Produktnamen, Zahlenformate, Entwicklerwerte).
 NO_TRANSLATION = re.compile(r"^[a-z0-9_.:/-]+$|^(https?://\S+$|line\.3|battery\.|de\.doorzign)|^\.zeitwart\.de$|^Europe/Berlin$")

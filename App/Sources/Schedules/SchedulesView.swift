@@ -68,6 +68,7 @@ struct SchedulesView: View {
             if canEdit {
                 ToolbarItem(placement: .primaryAction) {
                     Button { editing = .new } label: { Label("Zeitplan hinzufügen", systemImage: "plus") }
+                        .accessibilityIdentifier("schedules.add")
                 }
             }
         }

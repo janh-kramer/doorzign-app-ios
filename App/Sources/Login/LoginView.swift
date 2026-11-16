@@ -32,7 +32,7 @@ struct LoginView: View {
                 Section {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(context.system.name).font(.title2.bold())
-                        Text(context.profile.systemType == .edge ? "DoorZign Edge" : "Zeitwart Cloud")
+                        Text(context.profile.systemType == .edge ? "Doorzign Edge" : "Zeitwart Cloud")
                             .foregroundStyle(.secondary)
                     }
                     .listRowBackground(Color.clear)
@@ -60,6 +60,7 @@ struct LoginView: View {
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                             .focused($focus, equals: .username)
+                            .accessibilityIdentifier("login.username")
                             .submitLabel(.next)
                             .onSubmit { focus = .password }
                         if let messages = error?.fields["username"] {
@@ -68,6 +69,7 @@ struct LoginView: View {
                         SecureField("Passwort", text: $password)
                             .textContentType(.password)
                             .focused($focus, equals: .password)
+                            .accessibilityIdentifier("login.password")
                             .submitLabel(.go)
                             .onSubmit(loginWithPassword)
                         if let messages = error?.fields["password"] {
@@ -75,6 +77,7 @@ struct LoginView: View {
                         }
                         Button("Anmelden", action: loginWithPassword)
                             .font(.headline)
+                            .accessibilityIdentifier("login.submit")
                             .disabled(username.isEmpty || password.isEmpty)
                     }
                 }

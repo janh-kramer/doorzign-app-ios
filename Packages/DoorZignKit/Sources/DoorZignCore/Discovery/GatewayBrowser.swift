@@ -21,7 +21,7 @@ public struct DiscoveredGateway: Identifiable, Hashable, Sendable {
     public func hash(into hasher: inout Hasher) { hasher.combine(serviceName) }
 }
 
-/// Sucht DoorZign-Gateways im lokalen Netz (`_doorzign._tcp`).
+/// Sucht Doorzign-Gateways im lokalen Netz (`_doorzign._tcp`).
 /// Erfordert `NSLocalNetworkUsageDescription` und `NSBonjourServices` in der Info.plist.
 @MainActor
 public final class GatewayBrowser {
@@ -81,7 +81,7 @@ public final class GatewayBrowser {
 
     private static func describe(_ error: NWError) -> String {
         if case .dns(let code) = error, code == -65570 /* kDNSServiceErr_PolicyDenied */ {
-            return L("Kein Zugriff auf das lokale Netzwerk. Bitte in den Einstellungen unter „DoorZign“ erlauben.")
+            return L("Kein Zugriff auf das lokale Netzwerk. Bitte in den Einstellungen unter „Doorzign“ erlauben.")
         }
         return L("Suche im Netzwerk nicht möglich (\(error.localizedDescription)).")
     }

@@ -18,7 +18,7 @@ struct SettingsView: View {
         Form {
             Section("Verbunden mit") {
                 LabeledContent("System", value: context.system?.name ?? context.profile.name)
-                LabeledContent("Typ", value: context.profile.systemType == .edge ? "DoorZign Edge" : "Zeitwart Cloud")
+                LabeledContent("Typ", value: context.profile.systemType == .edge ? "Doorzign Edge" : "Zeitwart Cloud")
                 LabeledContent("Adresse", value: Self.address(context.profile.baseURL))
                 if let api = context.system?.raw.apiVersion {
                     LabeledContent("API-Version", value: api)
