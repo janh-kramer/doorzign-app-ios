@@ -234,3 +234,11 @@
 "Übertragungen" = "Transfers";
 "über Mitternacht" = "overnight";
 "„%@“ wird entfernt." = "“%@” will be removed.";
+
+/* Schritt „Bild drehen“ (decisions 44, Glossar 2026-11-21) */
+"Bild drehen" = "Rotate image";
+"Dreh das Bild so, wie es auf dem Display stehen soll." = "Rotate the image the way it should appear on the display.";
+"Links drehen" = "Rotate left";
+"Rechts drehen" = "Rotate right";
+"Hochladen" = "Upload";
+"Das Bild konnte nicht gelesen werden." = "The image could not be read.";

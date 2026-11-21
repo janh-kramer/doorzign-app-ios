@@ -106,12 +106,139 @@ final class RoutingStubTransport: ClientTransport, @unchecked Sendable {
         #expect(prepared.width == 400 && prepared.height == 300)
     }
 
-    @Test func grossesBildWirdSkaliertUndJPEG() throws {
+    @Test func grossesPNGWirdSkaliertUndBleibtPNG() throws {
         let png = try Self.makePNG(width: 4000, height: 3000)
         let prepared = try ImagePreparation.prepare(png, maxBytes: 5_000_000)
-        #expect(prepared.mimeType == "image/jpeg")
+        #expect(prepared.mimeType == "image/png")
         #expect(max(prepared.width, prepared.height) == 2400)
         #expect(prepared.data.count <= 5_000_000)
+    }
+
+    @Test func pngZuGrossAlsPNGWirdJPEG() throws {
+        // Fotoähnlich (Verlauf mit leichtem Rauschen): als PNG groß, als JPEG klein.
+        let (width, height) = (1200, 900)
+        var pixels = [UInt8](repeating: 255, count: width * height * 4)
+        var seed: UInt32 = 1
+        for y in 0..<height { for x in 0..<width {
+            seed = seed &* 1_664_525 &+ 1_013_904_223
+            let noise = Int(seed >> 28)  // 0…15
+            let i = (y * width + x) * 4
+            pixels[i] = UInt8(x * 200 / width + noise); pixels[i + 1] = UInt8(y * 200 / height + noise); pixels[i + 2] = 128
+        } }
+        let context = try #require(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,
+                                             bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                                             bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        let image = try #require(context.makeImage())
+        let png = try #require(ImagePreparation.encode(image, type: .png, quality: nil))
+        let rotatedPNG = try ImagePreparation.prepare(png, quarterTurns: 1, maxBytes: .max)
+        #expect(rotatedPNG.mimeType == "image/png")
+        let prepared = try ImagePreparation.prepare(png, quarterTurns: 1, maxBytes: rotatedPNG.data.count - 1)
+        #expect(prepared.mimeType == "image/jpeg")
+        #expect(prepared.width == 900 && prepared.height == 1200)
+    }
+
+    // MARK: Bild drehen (decisions 44)
+
+    /// Gespeichert quer: linke Hälfte rot, rechte blau. Optional mit EXIF-Orientation.
+    static func makeHalves(width: Int, height: Int, type: UTType, orientation: UInt32? = nil) throws -> Data {
+        let context = try #require(CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+                                             space: CGColorSpaceCreateDeviceRGB(),
+                                             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.setFillColor(red: 1, green: 0, blue: 0, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: width / 2, height: height))
+        context.setFillColor(red: 0, green: 0, blue: 1, alpha: 1)
+        context.fill(CGRect(x: width / 2, y: 0, width: width - width / 2, height: height))
+        let image = try #require(context.makeImage())
+        let data = NSMutableData()
+        let destination = try #require(CGImageDestinationCreateWithData(data, type.identifier as CFString, 1, nil))
+        var properties: [CFString: Any] = [kCGImageDestinationLossyCompressionQuality: 0.95]
+        if let orientation { properties[kCGImagePropertyOrientation] = orientation }
+        CGImageDestinationAddImage(destination, image, properties as CFDictionary)
+        #expect(CGImageDestinationFinalize(destination))
+        return data as Data
+    }
+
+    /// Farbe (r, g, b) am Bildpunkt (x, y), y von oben.
+    static func pixel(_ data: Data, x: Int, y: Int) throws -> (Int, Int, Int) {
+        let source = try #require(CGImageSourceCreateWithData(data as CFData, nil))
+        let image = try #require(CGImageSourceCreateImageAtIndex(source, 0, nil))
+        var buffer = [UInt8](repeating: 0, count: image.width * image.height * 4)
+        let context = try #require(CGContext(data: &buffer, width: image.width, height: image.height, bitsPerComponent: 8,
+                                             bytesPerRow: image.width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                                             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        let i = (y * image.width + x) * 4
+        return (Int(buffer[i]), Int(buffer[i + 1]), Int(buffer[i + 2]))
+    }
+
+    static func isRed(_ c: (Int, Int, Int)) -> Bool { c.0 > 200 && c.1 < 60 && c.2 < 60 }
+    static func isBlue(_ c: (Int, Int, Int)) -> Bool { c.0 < 60 && c.1 < 60 && c.2 > 200 }
+
+    static func orientation(_ data: Data) throws -> UInt32? {
+        let source = try #require(CGImageSourceCreateWithData(data as CFData, nil))
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        return properties?[kCGImagePropertyOrientation] as? UInt32
+    }
+
+    @Test func hochformatMitExif6KommtOhneDrehungAufrechtAn() throws {
+        // Gespeichert 80×40, EXIF 6 (90° im Uhrzeigersinn anzeigen) → aufrecht 40×80, oben rot, unten blau.
+        let jpeg = try Self.makeHalves(width: 80, height: 40, type: .jpeg, orientation: 6)
+        #expect(try Self.orientation(jpeg) == 6)
+        let prepared = try ImagePreparation.prepare(jpeg, maxBytes: 5_000_000)
+        #expect(prepared.mimeType == "image/jpeg")
+        #expect(prepared.width == 40 && prepared.height == 80)
+        #expect([nil, 1].contains(try Self.orientation(prepared.data)))
+        #expect(Self.isRed(try Self.pixel(prepared.data, x: 20, y: 10)))
+        #expect(Self.isBlue(try Self.pixel(prepared.data, x: 20, y: 70)))
+    }
+
+    @Test func einmalRechtsTauschtBreiteUndHoehe() throws {
+        // 80×40, links rot → im Uhrzeigersinn gedreht 40×80, rot oben.
+        let jpeg = try Self.makeHalves(width: 80, height: 40, type: .jpeg)
+        let prepared = try ImagePreparation.prepare(jpeg, quarterTurns: 1, maxBytes: 5_000_000)
+        #expect(prepared.width == 40 && prepared.height == 80)
+        #expect(Self.isRed(try Self.pixel(prepared.data, x: 20, y: 10)))
+        #expect(Self.isBlue(try Self.pixel(prepared.data, x: 20, y: 70)))
+    }
+
+    @Test func einmalLinksDrehtGegenDenUhrzeigersinn() throws {
+        // links rot → gegen den Uhrzeigersinn gedreht: rot unten.
+        let jpeg = try Self.makeHalves(width: 80, height: 40, type: .jpeg)
+        let prepared = try ImagePreparation.prepare(jpeg, quarterTurns: -1, maxBytes: 5_000_000)
+        #expect(prepared.width == 40 && prepared.height == 80)
+        #expect(Self.isBlue(try Self.pixel(prepared.data, x: 20, y: 10)))
+        #expect(Self.isRed(try Self.pixel(prepared.data, x: 20, y: 70)))
+    }
+
+    @Test func exif6UndRechtsDrehenAddierenSich() throws {
+        // EXIF 6 aufrecht (rot oben), dann 1× rechts → 80×40, rot rechts.
+        let jpeg = try Self.makeHalves(width: 80, height: 40, type: .jpeg, orientation: 6)
+        let prepared = try ImagePreparation.prepare(jpeg, quarterTurns: 1, maxBytes: 5_000_000)
+        #expect(prepared.width == 80 && prepared.height == 40)
+        #expect(Self.isBlue(try Self.pixel(prepared.data, x: 10, y: 20)))
+        #expect(Self.isRed(try Self.pixel(prepared.data, x: 70, y: 20)))
+    }
+
+    @Test func vierDrehungenSindKeine() throws {
+        let png = try Self.makeHalves(width: 80, height: 40, type: .png)
+        #expect(try ImagePreparation.prepare(png, quarterTurns: 4, maxBytes: 5_000_000).data == png)
+    }
+
+    @Test func jpegOhneDrehungWirdTrotzdemNeuKodiert() throws {
+        let jpeg = try Self.makeHalves(width: 80, height: 40, type: .jpeg)
+        let prepared = try ImagePreparation.prepare(jpeg, maxBytes: 5_000_000)
+        #expect(prepared.data != jpeg)
+        #expect(prepared.mimeType == "image/jpeg")
+        #expect([nil, 1].contains(try Self.orientation(prepared.data)))
+    }
+
+    @Test func gedrehtesPNGBleibtPNG() throws {
+        let png = try Self.makeHalves(width: 80, height: 40, type: .png)
+        let prepared = try ImagePreparation.prepare(png, quarterTurns: 1, maxBytes: 5_000_000)
+        #expect(prepared.mimeType == "image/png" && prepared.fileExtension == "png")
+        #expect(prepared.data != png)
+        #expect(prepared.width == 40 && prepared.height == 80)
+        #expect(Self.isRed(try Self.pixel(prepared.data, x: 20, y: 10)))
     }
 
     @Test func zuGrossFuerLimit() throws {

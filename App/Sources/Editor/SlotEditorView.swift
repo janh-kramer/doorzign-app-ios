@@ -12,6 +12,8 @@ struct SlotEditorView: View {
     @State private var confirmDiscard = false
     @State private var photoItem: PhotosPickerItem?
     @State private var showCamera = false
+    /// Kamerafoto, das nach dem Schließen der Kamera in den Schritt „Bild drehen“ geht.
+    @State private var cameraData: Data?
     @State private var showLibrary = false
     private let client: Client
 
@@ -92,9 +94,22 @@ struct SlotEditorView: View {
         } message: {
             Text("Neu laden verwirft deine Änderungen. Überschreiben ersetzt die Änderungen der anderen Person.")
         }
-        .sheet(isPresented: $showCamera) {
-            CameraPicker { data in Task { await model.uploadImage(data) } }
+        .sheet(isPresented: $showCamera, onDismiss: {
+            // Erst nach dem Schließen der Kamera, sonst überlagern sich die Sheets.
+            if let data = cameraData {
+                cameraData = nil
+                model.chooseImage(data)
+            }
+        }) {
+            CameraPicker { data in cameraData = data }
                 .ignoresSafeArea()
+        }
+        .sheet(item: Binding(get: { model.pendingImage }, set: { if $0 == nil { model.cancelPendingImage() } })) { pending in
+            ImageRotateView(data: pending.data) {
+                model.cancelPendingImage()
+            } onUpload: { turns in
+                Task { await model.uploadPendingImage(quarterTurns: turns) }
+            }
         }
         .sheet(isPresented: $showLibrary) {
             MediaLibraryView(client: client, selectedId: model.draft.image.mediaId) { mediaId in
@@ -106,7 +121,7 @@ struct SlotEditorView: View {
             photoItem = nil
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
-                    await model.uploadImage(data)
+                    model.chooseImage(data)
                 }
             }
         }

@@ -32,6 +32,13 @@ public final class SlotEditorModel {
     // Bild
     public private(set) var isUploading = false
     public private(set) var uploadError: String?
+    /// Foto aus Kamera/Fotomediathek, das im Schritt „Bild drehen“ wartet (decisions 44). Noch kein Request.
+    public private(set) var pendingImage: PendingImage?
+
+    public struct PendingImage: Identifiable, Sendable {
+        public let id = UUID()
+        public let data: Data
+    }
 
     // Kalender
     public enum CalendarCheck: Equatable, Sendable {
@@ -239,15 +246,31 @@ public final class SlotEditorModel {
 
     // MARK: Bild
 
-    /// Bereitet die Bilddaten vor (HEIC → JPEG, ≤ 2400 px, ≤ mediaMaxBytes) und lädt sie hoch.
-    public func uploadImage(_ data: Data) async {
+    /// Foto aus Kamera/Fotomediathek übernehmen: öffnet den Schritt „Bild drehen“, lädt noch nichts hoch.
+    public func chooseImage(_ data: Data) {
+        uploadError = nil
+        pendingImage = PendingImage(data: data)
+    }
+
+    /// „Abbrechen“ im Schritt „Bild drehen“: Auswahl verwerfen, kein Request.
+    public func cancelPendingImage() { pendingImage = nil }
+
+    /// „Hochladen“ im Schritt „Bild drehen“ mit der gewählten Drehung (90°-Schritte im Uhrzeigersinn).
+    public func uploadPendingImage(quarterTurns: Int) async {
+        guard let pending = pendingImage else { return }
+        pendingImage = nil
+        await uploadImage(pending.data, quarterTurns: quarterTurns)
+    }
+
+    /// Bereitet die Bilddaten vor (EXIF + Drehung in die Pixel, HEIC → JPEG, ≤ 2400 px, ≤ mediaMaxBytes) und lädt sie hoch.
+    public func uploadImage(_ data: Data, quarterTurns: Int = 0) async {
         isUploading = true
         uploadError = nil
         defer { isUploading = false }
         do {
             let maxBytes = system?.raw.mediaMaxBytes ?? 5_000_000
             let prepared = try await Task.detached(priority: .userInitiated) {
-                try ImagePreparation.prepare(data, maxBytes: maxBytes)
+                try ImagePreparation.prepare(data, quarterTurns: quarterTurns, maxBytes: maxBytes)
             }.value
             let media = try await MediaUploader.upload(prepared, client: client)
             draft.image.mediaId = media.id

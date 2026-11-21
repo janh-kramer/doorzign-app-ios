@@ -86,4 +86,41 @@ func makeSystem(features: [String]) throws -> SystemInfo {
         await none.load()
         #expect(!none.availableKinds.contains(.image))
     }
+
+    @Test func bildDrehenAbbrechenSchicktNichts() async throws {
+        let transport = SlotEditorTests.makeTransport()
+        let model = SlotEditorModel(displayId: "d-1", slot: 2, display: nil, client: transport.makeClient(),
+                                    system: try makeSystem(features: ["media.upload"]))
+        await model.load()
+        model.chooseImage(try ImagePreparationTests.makeHalves(width: 80, height: 40, type: .jpeg))
+        #expect(model.pendingImage != nil)
+        model.cancelPendingImage()
+        #expect(model.pendingImage == nil)
+        await model.uploadPendingImage(quarterTurns: 1)  // nichts mehr offen → kein Request
+        #expect(transport.requests("uploadMedia").isEmpty)
+        #expect(model.draft.image.mediaId == nil)
+    }
+
+    @Test func bildDrehenHochladenSchicktGedrehtesBild() async throws {
+        let transport = SlotEditorTests.makeTransport()
+        transport.on("uploadMedia") { _, _ in
+            RoutingStubTransport.json(.created, ["id": "m-9", "mime": "image/jpeg", "width": 40, "height": 80])
+        }
+        let model = SlotEditorModel(displayId: "d-1", slot: 2, display: nil, client: transport.makeClient(),
+                                    system: try makeSystem(features: ["media.upload"]))
+        await model.load()
+        model.chooseImage(try ImagePreparationTests.makeHalves(width: 80, height: 40, type: .jpeg))
+        #expect(transport.requests("uploadMedia").isEmpty)  // erst nach „Hochladen“
+        await model.uploadPendingImage(quarterTurns: 1)
+        #expect(model.pendingImage == nil && model.uploadError == nil)
+        #expect(model.draft.image.mediaId == "m-9")
+        let body = try #require(transport.requests("uploadMedia").first).body
+        // JPEG im Multipart-Body suchen (SOI … EOI) und Maße prüfen.
+        let start = try #require(body.firstRange(of: Data([0xFF, 0xD8, 0xFF]))).lowerBound
+        let end = try #require(body.lastRange(of: Data([0xFF, 0xD9]))).upperBound
+        let source = try #require(CGImageSourceCreateWithData(body[start..<end] as CFData, nil))
+        let properties = try #require(CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any])
+        #expect(properties[kCGImagePropertyPixelWidth] as? Int == 40)
+        #expect(properties[kCGImagePropertyPixelHeight] as? Int == 80)
+    }
 }

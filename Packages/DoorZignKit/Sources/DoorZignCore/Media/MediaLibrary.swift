@@ -4,6 +4,7 @@ import Foundation
 import ImageIO
 import Observation
 import OpenAPIRuntime
+import UniformTypeIdentifiers
 
 /// Bildbibliothek (`GET /media`, nur mit Feature `media.library`). Auswahl setzt `mediaId` ohne neuen Upload.
 @MainActor
@@ -80,6 +81,6 @@ public actor MediaThumbnailLoader {
             kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
         ]
         guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
-        return ImagePreparation.encodeJPEG(image, quality: 0.8)
+        return ImagePreparation.encode(image, type: .jpeg, quality: 0.8)
     }
 }
