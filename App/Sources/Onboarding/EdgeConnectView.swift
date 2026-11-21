@@ -65,7 +65,7 @@ struct EdgeConnectView: View {
             } header: {
                 Text("Adresse eingeben")
             } footer: {
-                Text("Host oder IP-Adresse, optional mit Port (Standard 8443).")
+                Text("Host oder IP-Adresse, optional mit Port (Standard 9443).")
             }
         }
         .navigationTitle("Doorzign Edge")

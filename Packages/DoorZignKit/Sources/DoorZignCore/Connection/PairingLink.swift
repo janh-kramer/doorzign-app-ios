@@ -60,7 +60,7 @@ public enum PairingLink: Equatable, Sendable {
 /// Bildung der API-Basis-URLs aus Benutzereingaben.
 public enum APIBase {
     public static let pathPrefix = "/mobile/v1"
-    public static let defaultEdgePort = 8443
+    public static let defaultEdgePort = 9443
     public static let cloudDomain = "zeitwart.de"
 
     /// Hängt `/mobile/v1` an, falls noch nicht vorhanden; entfernt abschließende Schrägstriche.
@@ -90,7 +90,7 @@ public enum APIBase {
         return mobileBase(url)
     }
 
-    /// Edge-Eingabe: `host[:port]` → `https://host:8443/mobile/v1`. Volle https-URL ebenfalls erlaubt.
+    /// Edge-Eingabe: `host[:port]` → `https://host:9443/mobile/v1`. Volle https-URL ebenfalls erlaubt.
     public static func edge(fromInput input: String) -> URL? {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return nil }

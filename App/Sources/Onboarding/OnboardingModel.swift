@@ -58,7 +58,7 @@ final class OnboardingModel {
 
     func connectEdge(address: String) async {
         guard let url = APIBase.edge(fromInput: address) else {
-            errorMessage = String(localized: "Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:8443.")
+            errorMessage = String(localized: "Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:9443.")
             return
         }
         await probeForTrust(url: url)

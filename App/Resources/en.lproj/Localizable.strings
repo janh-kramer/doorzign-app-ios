@@ -51,7 +51,7 @@
 "Bibliothek nicht verfügbar" = "Library not available";
 "Bild" = "Image";
 "Bitte den Namen der Instanz (z. B. „firma“) oder die vollständige Adresse eingeben." = "Please enter the instance name (e.g. “company”) or the full address.";
-"Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:8443." = "Please enter a valid address, e.g. 192.168.1.10 or gateway.local:8443.";
+"Bitte eine gültige Adresse eingeben, z. B. 192.168.1.10 oder gateway.local:9443." = "Please enter a valid address, e.g. 192.168.1.10 or gateway.local:9443.";
 "Bitte mindestens ein Textfeld ausfüllen." = "Please fill in at least one text field.";
 "Darstellung" = "Appearance";
 "Das Display blinkt gleich." = "The display will blink shortly.";
@@ -104,7 +104,7 @@
 "Gültigkeit" = "Validity";
 "Hintergrund" = "Background";
 "Hinweis" = "Notice";
-"Host oder IP-Adresse, optional mit Port (Standard 8443)." = "Host or IP address, optionally with port (default 8443).";
+"Host oder IP-Adresse, optional mit Port (Standard 9443)." = "Host or IP address, optionally with port (default 9443).";
 "Im Netzwerk suchen" = "Search the network";
 "Impressum" = "Legal notice";
 "In der Bibliothek sind noch keine Bilder vorhanden." = "There are no images in the library yet.";

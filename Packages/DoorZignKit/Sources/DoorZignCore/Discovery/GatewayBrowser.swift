@@ -13,7 +13,7 @@ public struct DiscoveredGateway: Identifiable, Hashable, Sendable {
     public let node: String?
     /// `fp` aus dem TXT-Record. Nicht authentisch – nur zur Information, es gilt trotzdem TOFU.
     public let advertisedFingerprint: String?
-    /// HTTPS-Port aus dem TXT-Record (`https`), sonst 8443.
+    /// HTTPS-Port aus dem TXT-Record (`https`), sonst `APIBase.defaultEdgePort` (9443).
     public let httpsPort: Int
     let endpoint: NWEndpoint
 

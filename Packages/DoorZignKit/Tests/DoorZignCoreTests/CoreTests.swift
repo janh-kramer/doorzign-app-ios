@@ -54,7 +54,12 @@ import Testing
     }
 
     @Test func edgeEingaben() {
-        #expect(APIBase.edge(fromInput: "192.168.1.10")?.absoluteString == "https://192.168.1.10:8443/mobile/v1")
+        // Ohne Port: Standard 9443 (Vertrag 1.4.1; 8443 belegt die Qbic-Firmware auf dem BXP-100).
+        #expect(APIBase.defaultEdgePort == 9443)
+        #expect(APIBase.edge(fromInput: "192.168.1.10")?.absoluteString == "https://192.168.1.10:9443/mobile/v1")
+        #expect(APIBase.edge(fromInput: "gateway.local")?.absoluteString == "https://gateway.local:9443/mobile/v1")
+        // Ein angegebener Port bleibt, auch der alte 8443.
+        #expect(APIBase.edge(fromInput: "gw.local:8443")?.absoluteString == "https://gw.local:8443/mobile/v1")
         #expect(APIBase.edge(fromInput: "gw.local:9443")?.absoluteString == "https://gw.local:9443/mobile/v1")
     }
 }
