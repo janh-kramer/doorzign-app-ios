@@ -13,13 +13,21 @@ final class OnboardingModel {
         let fingerprint: String
     }
 
-    var isBusy = false
     var errorMessage: String?
     var pendingTrust: PendingTrust?
-    /// Über `onOpenURL` eingegangener QR-Link, der verarbeitet werden soll.
-    var pendingLink: PairingLink?
+    /// Serialisiert die Prüfungen; Verbindungslinks warten auf eine laufende Prüfung (decisions 45).
+    let gate = LinkGate()
+    var isBusy: Bool { gate.isBusy }
 
     // MARK: QR-Code / Link
+
+    /// Geöffneter Verbindungslink (`onOpenURL`), roh: wird wie ein gescannter QR-Code geprüft. Läuft gerade
+    /// eine Prüfung, wird er gehalten und danach übernommen – die laufende Prüfung wird nicht abgebrochen.
+    func receiveLink(_ raw: String, session: AppSession) async {
+        await gate.submit(raw) { [weak self] raw in
+            await self?.connect(scannedCode: raw, session: session)
+        }
+    }
 
     func connect(link: PairingLink, session: AppSession) async {
         await run {
@@ -57,28 +65,28 @@ final class OnboardingModel {
     }
 
     func connectEdge(gateway: DiscoveredGateway) async {
-        isBusy = true
-        defer { isBusy = false }
-        do {
-            let url = try await GatewayBrowser.resolve(gateway)
-            await probeForTrust(url: url)
-        } catch {
-            errorMessage = String(localized: "Das Gateway „\(gateway.displayName)“ konnte nicht erreicht werden.")
+        await gate.run {
+            do {
+                let url = try await GatewayBrowser.resolve(gateway)
+                await probeForTrust(url: url)
+            } catch {
+                errorMessage = String(localized: "Das Gateway „\(gateway.displayName)“ konnte nicht erreicht werden.")
+            }
         }
     }
 
     private func probeForTrust(url: URL) async {
-        isBusy = true
-        defer { isBusy = false }
-        do {
-            let probe = try await SystemProbe.probe(urls: [url], trust: .captureForConfirmation)
-            guard let fingerprint = probe.presentedFingerprint else {
-                errorMessage = String(localized: "Das Gateway hat kein Zertifikat vorgelegt.")
-                return
+        await gate.run {
+            do {
+                let probe = try await SystemProbe.probe(urls: [url], trust: .captureForConfirmation)
+                guard let fingerprint = probe.presentedFingerprint else {
+                    errorMessage = String(localized: "Das Gateway hat kein Zertifikat vorgelegt.")
+                    return
+                }
+                pendingTrust = PendingTrust(probe: probe, fingerprint: fingerprint)
+            } catch {
+                errorMessage = (error as? LocalizedError)?.errorDescription ?? APIError.from(error).message
             }
-            pendingTrust = PendingTrust(probe: probe, fingerprint: fingerprint)
-        } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? APIError.from(error).message
         }
     }
 
@@ -118,15 +126,15 @@ final class OnboardingModel {
 
     /// Führt einen Schritt aus; `APIError` als Rückgabe oder geworfene Fehler landen in `errorMessage`.
     private func run(_ step: () async throws -> APIError?) async {
-        isBusy = true
-        errorMessage = nil
-        defer { isBusy = false }
-        do {
-            if let error = try await step() {
-                errorMessage = error.message
+        await gate.run {
+            errorMessage = nil
+            do {
+                if let error = try await step() {
+                    errorMessage = error.message
+                }
+            } catch {
+                errorMessage = (error as? LocalizedError)?.errorDescription ?? APIError.from(error).message
             }
-        } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? APIError.from(error).message
         }
     }
 }

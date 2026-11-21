@@ -66,11 +66,6 @@ struct WelcomeView: View {
             #endif
         }
         .busyOverlay(model.isBusy)
-        .task(id: model.pendingLink) {
-            guard let link = model.pendingLink else { return }
-            model.pendingLink = nil
-            await model.connect(link: link, session: session)
-        }
         // Fehler eines QR-Links (onOpenURL) – die Unterseiten zeigen ihre Fehler selbst an.
         .alert(
             "Hinweis",

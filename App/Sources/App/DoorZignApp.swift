@@ -21,6 +21,7 @@ struct DoorZignApp: App {
 struct RootView: View {
     @Environment(AppSession.self) private var session
     @State private var onboarding = OnboardingModel()
+    @State private var links = LinkRouter()
 
     var body: some View {
         Group {
@@ -33,22 +34,38 @@ struct RootView: View {
                 LoginView(context: context)
             case .signedIn(let context):
                 HomeView(context: context)
+                    // Angemeldet, Link auf ein anderes System (decisions 45): gleicher Dialog wie in den Einstellungen.
+                    .confirmationDialog(
+                        "Mit anderem System verbinden?",
+                        isPresented: Binding(get: { links.switchRequest != nil }, set: { if !$0 { links.switchRequest = nil } }),
+                        titleVisibility: .visible
+                    ) {
+                        Button("Verbindung trennen", role: .destructive) {
+                            Task { await links.confirmSwitch(session: session, onboarding: onboarding) }
+                        }
+                    } message: {
+                        Text("Zugangsdaten und zwischengespeicherte Daten werden gelöscht.")
+                    }
             }
         }
         .environment(onboarding)
         .animation(.default, value: session.phaseID)
         // QR-Codes, die mit der Kamera-App gescannt werden, öffnen die App über doorzign://edge|cloud.
+        // Roh weiterreichen (auch ungültige Links zeigen einen Fehler); eigener Task, damit nichts die
+        // Prüfung abbricht (decisions 45). Den SSO-Rückruf verarbeitet ASWebAuthenticationSession selbst.
         .onOpenURL { url in
-            guard let link = try? PairingLink.parse(url.absoluteString) else { return }
-            onboarding.pendingLink = link
+            guard url.scheme?.lowercased() == "doorzign", ["edge", "cloud"].contains(url.host?.lowercased() ?? "") else { return }
+            Task { await links.handle(url.absoluteString, session: session, onboarding: onboarding) }
+        }
+        .onChange(of: session.phaseID) {
+            Task { await links.phaseChanged(session: session, onboarding: onboarding) }
         }
         #if DEBUG
         // UI-Tests/Screenshots: Verbindungslink per Startargument `-DZPairingLink <url>`,
         // ohne Systemdialog „In Doorzign öffnen?“.
         .task {
-            if let text = UserDefaults.standard.string(forKey: "DZPairingLink"),
-               let link = try? PairingLink.parse(text) {
-                onboarding.pendingLink = link
+            if let text = UserDefaults.standard.string(forKey: "DZPairingLink") {
+                await links.handle(text, session: session, onboarding: onboarding)
             }
         }
         #endif
