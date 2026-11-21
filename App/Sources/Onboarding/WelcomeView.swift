@@ -45,9 +45,12 @@ struct WelcomeView: View {
                         )
                     }
                     #if DEBUG
-                    Button("Entwicklung: Mock-Server") { showMock = true }
-                        .font(.footnote)
-                        .padding(.top, 24)
+                    // Nicht in Screenshots (Start mit `-DZPairingLink`).
+                    if UserDefaults.standard.string(forKey: "DZPairingLink") == nil {
+                        Button("Entwicklung: Mock-Server") { showMock = true }
+                            .font(.footnote)
+                            .padding(.top, 24)
+                    }
                     #endif
                 }
                 .padding()
@@ -68,6 +71,24 @@ struct WelcomeView: View {
             model.pendingLink = nil
             await model.connect(link: link, session: session)
         }
+        // Fehler eines QR-Links (onOpenURL) – die Unterseiten zeigen ihre Fehler selbst an.
+        .alert(
+            "Hinweis",
+            isPresented: Binding(
+                get: { model.errorMessage != nil && path.isEmpty && !isMockShown },
+                set: { if !$0 { model.errorMessage = nil } }
+            ),
+            actions: { Button("OK") { model.errorMessage = nil } },
+            message: { Text(model.errorMessage ?? "") }
+        )
+    }
+
+    private var isMockShown: Bool {
+        #if DEBUG
+        showMock
+        #else
+        false
+        #endif
     }
 }
 

@@ -7,7 +7,8 @@ import XCTest
 /// - `DZ_LINK`: Verbindungslink `doorzign://edge?…` der Demo-Instanz
 /// - `DZ_USER`, `DZ_PASSWORD`: Demo-Benutzer mit Bearbeiten-Recht
 /// - `DZ_LANGUAGE`: `de` oder `en`
-/// - `DZ_DISPLAY`: Name des Displays für Detail-/Editor-Aufnahmen (sonst das erste der Liste)
+/// - `DZ_DISPLAY`: Teil des Namens des Displays für Detail-/Editor-Aufnahmen (sonst das erste der Liste)
+/// - `DZ_ADHOC_DISPLAY`, `DZ_SCHEDULE_DISPLAY`: Displays für Ad-hoc- und Zeitplan-Aufnahmen (optional)
 ///
 /// Speichert nichts auf der Instanz: Editoren werden nur geöffnet und wieder verlassen.
 @MainActor
@@ -31,7 +32,12 @@ final class ScreenshotTests: XCTestCase {
                 snap("00-willkommen")
             }
         }
-        if username.waitForExistence(timeout: 20) {
+        let alert = app.alerts.firstMatch
+        if !username.waitForExistence(timeout: 20), alert.exists {
+            XCTFail("Verbindung fehlgeschlagen: \(alert.staticTexts.allElementsBoundByIndex.map(\.label).joined(separator: " – "))")
+            return
+        }
+        if username.exists {
             username.tap()
             username.typeText(try XCTUnwrap(env["DZ_USER"], "DZ_USER fehlt"))
             let password = app.secureTextFields["login.password"]
@@ -43,54 +49,54 @@ final class ScreenshotTests: XCTestCase {
         // Display-Liste.
         let rows = app.buttons.matching(identifier: "display.row")
         XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 30), "Display-Liste nicht geladen")
-        settle(3)  // Miniaturen laden
+        settle(4)  // Miniaturen laden
         snap("01-displays")
 
-        // Detail.
-        if let name = env["DZ_DISPLAY"], !name.isEmpty {
-            rows.containing(NSPredicate(format: "label CONTAINS %@", name)).firstMatch.tap()
-        } else {
-            rows.firstMatch.tap()
-        }
-        let firstCard = app.buttons["slot.card.1"].exists ? app.buttons["slot.card.1"] : app.buttons["slot.card.2"]
-        XCTAssertTrue(firstCard.waitForExistence(timeout: 20), "Detailansicht nicht geladen")
+        // Detail, Kartenmenü und Editor (DZ_DISPLAY).
+        openDisplay(env["DZ_DISPLAY"])
         settle(3)
         snap("02-detail")
-
-        // Kartenmenü einer nicht aktiven Ansicht (zeigt „anzeigen“ und „bearbeiten“).
-        let card = ["slot.card.2", "slot.card.3", "slot.card.1"].map { app.buttons[$0] }.first { $0.exists } ?? firstCard
-        card.tap()
-        let edit = app.buttons["slot.edit"]
-        if edit.waitForExistence(timeout: 5) {
-            settle(1)
-            snap("03-ansicht-menue")
-            edit.tap()
-            settle(4)  // Live-Vorschau
-            snap("04-editor")
-            goBack()
-        }
-
-        // Ad-hoc-Nachricht.
-        if scrollTo(app.buttons["adhoc.open"]) {
-            app.buttons["adhoc.open"].tap()
-            settle(2)
-            snap("05-adhoc")
-            goBack()
-        }
-
-        // Zeitpläne und Editor „Neuer Zeitplan“ (ohne Speichern).
-        if scrollTo(app.buttons["schedules.open"]) {
-            app.buttons["schedules.open"].tap()
-            settle(2)
-            snap("06-zeitplaene")
-            let add = app.buttons["schedules.add"]
-            if add.waitForExistence(timeout: 5) {
-                add.tap()
-                settle(2)
-                snap("07-zeitplan-neu")
-                // Abbrechen: erster Button der Navigationsleiste im Sheet.
-                app.navigationBars.buttons.element(boundBy: 0).tap()
+        let card = ["slot.card.2", "slot.card.3", "slot.card.1"].map { app.buttons[$0] }.first { $0.exists }
+        if let card {
+            card.tap()
+            let edit = app.buttons["slot.edit"]
+            if edit.waitForExistence(timeout: 5) {
                 settle(1)
+                snap("03-ansicht-menue")
+                edit.tap()
+                settle(5)  // Live-Vorschau
+                snap("04-editor")
+                goBack()
+            }
+        }
+        goBack()
+
+        // Aktive Ad-hoc-Nachricht im Detail (DZ_ADHOC_DISPLAY).
+        if let name = env["DZ_ADHOC_DISPLAY"], !name.isEmpty {
+            openDisplay(name)
+            if scrollTo(app.buttons["adhoc.open"]) {
+                settle(1)
+                snap("05-adhoc")
+            }
+            goBack()
+        }
+
+        // Zeitpläne und „Neuer Zeitplan“ (DZ_SCHEDULE_DISPLAY), ohne Speichern.
+        if let name = env["DZ_SCHEDULE_DISPLAY"], !name.isEmpty {
+            openDisplay(name)
+            if scrollTo(app.buttons["schedules.open"]) {
+                app.buttons["schedules.open"].tap()
+                settle(2)
+                snap("06-zeitplaene")
+                let add = app.buttons["schedules.add"]
+                if add.waitForExistence(timeout: 5) {
+                    add.tap()
+                    settle(2)
+                    snap("07-zeitplan-neu")
+                    app.navigationBars.buttons.element(boundBy: 0).tap()  // Abbrechen
+                    settle(1)
+                }
+                goBack()
             }
             goBack()
         }
@@ -102,6 +108,21 @@ final class ScreenshotTests: XCTestCase {
             settle(2)
             snap("08-uebertragungen")
         }
+    }
+
+    /// Öffnet das Display, dessen Zeile den Namen enthält (sonst das erste), und wartet auf die Ansichten.
+    private func openDisplay(_ name: String?) {
+        let rows = app.buttons.matching(identifier: "display.row")
+        XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 20), "Display-Liste nicht sichtbar")
+        var row = rows.firstMatch
+        if let name, !name.isEmpty {
+            row = rows.containing(NSPredicate(format: "label CONTAINS %@", name)).firstMatch
+            if !row.exists { row = rows.matching(NSPredicate(format: "label CONTAINS %@", name)).firstMatch }
+        }
+        XCTAssertTrue(scrollTo(row), "Display „\(name ?? "")“ nicht gefunden")
+        row.tap()
+        let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'slot.card.'"))
+        _ = cards.firstMatch.waitForExistence(timeout: 20)
     }
 
     // MARK: Hilfen
