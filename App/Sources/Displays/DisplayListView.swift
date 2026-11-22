@@ -205,7 +205,7 @@ struct PreviewThumbnail: View {
     /// Zusätzlicher Auslöser zum Neuladen, z. B. `Slot.etag` (Inhalt geändert).
     var refreshKey: String?
 
-    @State private var image: UIImage?
+    @State private var data: Data?
     @State private var loaded = false
 
     var body: some View {
@@ -214,11 +214,9 @@ struct PreviewThumbnail: View {
             if etag == nil {
                 // Vertrag 1.2.3: kein previewEtag → keine Vorschau (deaktiviert oder Bild fehlt).
                 Image(systemName: "eye.slash").foregroundStyle(.tertiary)
-            } else if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .interpolation(.none)
-                    .scaledToFit()
+            } else if let data, UIImage(data: data) != nil {
+                // Flächenmittelnd verkleinert (decisions 47), Cache-Schlüssel mit ETag.
+                ScaledPreviewImage(data: data, cacheKey: "\(displayId)-\(slot)-\(etag ?? "")-\(refreshKey ?? "")")
             } else if loaded {
                 Image(systemName: "photo").foregroundStyle(.tertiary)
             } else {
@@ -228,8 +226,7 @@ struct PreviewThumbnail: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
         .overlay(RoundedRectangle(cornerRadius: 6).stroke(.quaternary))
         .task(id: "\(displayId)-\(slot)-\(etag ?? "")-\(refreshKey ?? "")") {
-            let data = await previews.preview(displayId: displayId, slot: slot, expectedEtag: etag)
-            image = data.flatMap(UIImage.init(data:))
+            data = await previews.preview(displayId: displayId, slot: slot, expectedEtag: etag)
             loaded = true
         }
         .accessibilityLabel(etag == nil ? "Keine Vorschau für Ansicht \(slot)" : "Vorschau Ansicht \(slot)")

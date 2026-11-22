@@ -486,3 +486,62 @@ final class RoutingStubTransport: ClientTransport, @unchecked Sendable {
         #expect(SlotEditorModel.fieldLabel("content.source") == "Quelle")
     }
 }
+
+/// decisions 47: Vorschauen flächenmittelnd verkleinern.
+@Suite struct PreviewScalingTests {
+    /// 1-Pixel-Schachbrett Schwarz/Weiß als PNG.
+    static func checkerboard(width: Int, height: Int) throws -> Data {
+        var pixels = [UInt8](repeating: 255, count: width * height * 4)
+        for y in 0..<height { for x in 0..<width where (x + y) % 2 == 0 {
+            let i = (y * width + x) * 4
+            pixels[i] = 0; pixels[i + 1] = 0; pixels[i + 2] = 0
+        } }
+        let context = try #require(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,
+                                             bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                                             bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        let image = try #require(context.makeImage())
+        return try #require(ImagePreparation.encode(image, type: .png, quality: nil))
+    }
+
+    static func grayRange(_ image: CGImage) throws -> ClosedRange<Int> {
+        let (width, height) = (image.width, image.height)
+        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+        let context = try #require(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,
+                                             bytesPerRow: width * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                             bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+        var low = 255, high = 0
+        for i in stride(from: 0, to: pixels.count, by: 4) {
+            for c in 0..<3 { low = min(low, Int(pixels[i + c])); high = max(high, Int(pixels[i + c])) }
+        }
+        return low...high
+    }
+
+    @Test func schachbrettAufEinViertelWirdGrau() throws {
+        let png = try Self.checkerboard(width: 800, height: 480)
+        let image = try #require(PreviewScaling.downscaled(png, to: CGSize(width: 200, height: 120)))
+        #expect(image.width == 200 && image.height == 120)
+        let range = try Self.grayRange(image)
+        // ≈ 50 % Grau überall, kein Schwarz/Weiß-Muster (Nearest-Neighbor ergäbe 0…255).
+        #expect(range.lowerBound >= 110 && range.upperBound <= 145, "Bereich \(range)")
+    }
+
+    @Test func schachbrettKrummerFaktorBleibtGrau() throws {
+        let png = try Self.checkerboard(width: 800, height: 480)
+        let image = try #require(PreviewScaling.downscaled(png, to: CGSize(width: 137, height: 82)))
+        let range = try Self.grayRange(image)
+        #expect(range.lowerBound >= 90 && range.upperBound <= 165, "Bereich \(range)")
+    }
+
+    @Test func zielgroesseNurBeimVerkleinern() throws {
+        let png = try Self.checkerboard(width: 800, height: 480)
+        let size = try #require(PreviewScaling.pixelSize(of: png))
+        #expect(size == CGSize(width: 800, height: 480))
+        // Miniatur 64×64 pt @3x: passt auf 192 px Breite → 192×115.
+        #expect(PreviewScaling.targetPixelSize(image: size, frame: CGSize(width: 64, height: 64), displayScale: 3)
+                == CGSize(width: 192, height: 115))
+        // Groß genug dargestellt (Editor, Vergrößerung): nicht verkleinern → pixelgenau mit Nearest-Neighbor.
+        #expect(PreviewScaling.targetPixelSize(image: size, frame: CGSize(width: 400, height: 240), displayScale: 3) == nil)
+        #expect(PreviewScaling.targetPixelSize(image: size, frame: CGSize(width: 800, height: 480), displayScale: 1) == nil)
+    }
+}

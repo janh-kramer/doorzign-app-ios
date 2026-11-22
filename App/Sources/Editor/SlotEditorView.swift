@@ -141,9 +141,10 @@ struct SlotEditorView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 8).fill(Color.white)
                 // Nicht lesbare Antwort (z. B. Prism-Mock) zählt wie ein Fehler, sonst bliebe der Ladekreis stehen.
-                let image = model.previewPNG.flatMap(UIImage.init(data:))
-                if let image {
-                    Image(uiImage: image).resizable().interpolation(.none).scaledToFit()
+                let png = model.previewPNG.flatMap { UIImage(data: $0) != nil ? $0 : nil }
+                if let png {
+                    // Verkleinert flächenmittelnd, vergrößert pixelgenau (decisions 47).
+                    ScaledPreviewImage(data: png)
                         .opacity(model.isPreviewBlockedByLength ? 0.35 : 1)
                     if model.isPreviewBlockedByLength {
                         PreviewBlockedLabel()
