@@ -165,6 +165,7 @@ struct BatteryIndicator: View {
         } icon: {
             Image(systemName: Self.symbol(percent))
         }
+        .labelStyle(.compact)
         .foregroundStyle(level == .critical ? Color.red : level == .low ? Color.orange : Color.secondary)
         .accessibilityLabel("Akku \(percent.map { String(localized: "\($0) Prozent") } ?? level.label)")
     }
@@ -191,6 +192,7 @@ struct SignalIndicator: View {
         } icon: {
             Image(systemName: "cellularbars", variableValue: Double(quality.bars) / 3)
         }
+        .labelStyle(.compact)
         .foregroundStyle(quality == .weak ? Color.orange : Color.secondary)
         .accessibilityLabel("Signal \(quality.label)")
     }

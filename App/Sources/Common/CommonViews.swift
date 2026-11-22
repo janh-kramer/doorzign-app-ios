@@ -18,6 +18,21 @@ struct ErrorSection: View {
     }
 }
 
+/// Symbol und Text eng nebeneinander. Der Standardstil richtet Label-Symbole in `List`-Zeilen
+/// in einer festen Spalte aus und lässt dahinter viel Platz – für Kennzahlen wie Akku und Signal zu weit.
+struct CompactLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 4) {
+            configuration.icon
+            configuration.title
+        }
+    }
+}
+
+extension LabelStyle where Self == CompactLabelStyle {
+    static var compact: CompactLabelStyle { CompactLabelStyle() }
+}
+
 extension View {
     /// Schwebendes Bedienelement über Inhalt: Liquid Glass ab iOS 26, darunter Material.
     @ViewBuilder
