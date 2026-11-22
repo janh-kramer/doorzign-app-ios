@@ -130,10 +130,10 @@ struct DisplayRow: View {
                 .font(.caption)
                 if display.openJobs > 0 {
                     Label("Wird übertragen …", systemImage: "arrow.up.circle")
-                        .font(.caption).foregroundStyle(.blue)
+                        .labelStyle(.compact).font(.caption).foregroundStyle(.blue)
                 } else if let error = display.lastError, !error.isEmpty {
                     Label(error, systemImage: "exclamationmark.triangle")
-                        .font(.caption).foregroundStyle(.red).lineLimit(2)
+                        .labelStyle(.compact).font(.caption).foregroundStyle(.red).lineLimit(2)
                 }
             }
         }

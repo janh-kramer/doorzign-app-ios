@@ -333,7 +333,8 @@ struct DisplayHeader: View {
             .font(.caption)
             .foregroundStyle(.secondary)
             if let error = display.lastError, !error.isEmpty {
-                Label(error, systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(.red)
+                Label(error, systemImage: "exclamationmark.triangle")
+                    .labelStyle(.compact).font(.caption).foregroundStyle(.red)
             }
         }
         .padding(.vertical, 4)

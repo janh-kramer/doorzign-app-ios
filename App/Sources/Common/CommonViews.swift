@@ -22,7 +22,8 @@ struct ErrorSection: View {
 /// in einer festen Spalte aus und lässt dahinter viel Platz – für Kennzahlen wie Akku und Signal zu weit.
 struct CompactLabelStyle: LabelStyle {
     func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: 4) {
+        // Erste Grundlinie: bei mehrzeiligem Text steht das Symbol an der ersten Zeile.
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
             configuration.icon
             configuration.title
         }
