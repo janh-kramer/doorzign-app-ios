@@ -7,9 +7,10 @@ struct DisplayListView: View {
     let context: SignedInContext
     @State private var model: DisplayListModel
 
-    init(context: SignedInContext) {
+    /// `model` wird von der `HomeView` gehalten, damit die Übertragungen die MACs kennen (decisions 48).
+    init(context: SignedInContext, model: DisplayListModel) {
         self.context = context
-        _model = State(initialValue: DisplayListModel(client: context.client))
+        _model = State(initialValue: model)
     }
 
     var body: some View {
@@ -115,7 +116,7 @@ struct DisplayRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(display.name).font(.headline).lineLimit(1)
+                    Text(display.displayName).font(.headline).lineLimit(1)
                     Spacer(minLength: 4)
                     OnlineChip(online: display.online)
                 }

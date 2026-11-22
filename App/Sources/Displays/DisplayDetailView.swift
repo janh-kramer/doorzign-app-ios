@@ -34,7 +34,7 @@ struct DisplayDetailView: View {
                 ProgressView()
             }
         }
-        .navigationTitle(model.display?.name ?? "Display")
+        .navigationTitle(model.display?.displayName ?? "Display")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarMenu }
         .task { await model.autoRefresh() }
@@ -49,7 +49,7 @@ struct DisplayDetailView: View {
             }
         }
         .navigationDestination(for: JobsRoute.self) { route in
-            JobsView(context: context, scope: .display(route.displayId), title: model.display?.name)
+            JobsView(context: context, scope: .display(route.displayId), title: model.display?.displayName)
         }
         .navigationDestination(for: SchedulesRoute.self) { route in
             SchedulesView(context: context, displayId: route.displayId, display: model.display) {
@@ -311,7 +311,7 @@ struct DisplayHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(display.name).font(.title3.bold())
+                Text(display.displayName).font(.title3.bold())
                 Spacer()
                 OnlineChip(online: display.online)
             }

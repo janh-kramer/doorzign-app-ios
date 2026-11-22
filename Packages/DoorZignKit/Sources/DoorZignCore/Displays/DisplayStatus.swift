@@ -109,17 +109,11 @@ extension Display {
 }
 
 public enum DisplayListLogic {
-    /// Filtert, durchsucht (Name, Ort, MAC) und sortiert nach Name.
+    /// Filtert, durchsucht (angezeigter Name, Ort, MAC) und sortiert nach dem angezeigten Namen.
     public static func apply(_ displays: [Display], filter: DisplayFilter, search: String) -> [Display] {
-        let query = search.trimmingCharacters(in: .whitespaces)
-        return displays
+        displays
             .filter(filter.matches)
-            .filter { display in
-                query.isEmpty
-                    || display.name.localizedCaseInsensitiveContains(query)
-                    || (display.location ?? "").localizedCaseInsensitiveContains(query)
-                    || display.mac.localizedCaseInsensitiveContains(query)
-            }
-            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+            .filter { DisplayNaming.matches($0, query: search) }
+            .sorted { $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending }
     }
 }

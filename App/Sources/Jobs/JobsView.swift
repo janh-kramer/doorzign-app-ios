@@ -7,11 +7,15 @@ import SwiftUI
 struct JobsView: View {
     let context: SignedInContext
     let title: String?
+    /// MAC zu einer Display-ID, falls bekannt – für Aufträge an Displays ohne Namen (decisions 48).
+    let macForDisplay: (String) -> String?
     @State private var model: JobsModel
 
-    init(context: SignedInContext, scope: JobsModel.Scope, title: String?) {
+    init(context: SignedInContext, scope: JobsModel.Scope, title: String?,
+         macForDisplay: @escaping (String) -> String? = { _ in nil }) {
         self.context = context
         self.title = title
+        self.macForDisplay = macForDisplay
         _model = State(initialValue: JobsModel(scope: scope, client: context.client))
     }
 
@@ -78,9 +82,11 @@ struct JobsView: View {
             Section(title) {
                 ForEach(jobs, id: \.id) { job in
                     if isGlobal {
-                        NavigationLink(value: job.displayId) { JobRow(job: job, showsDisplay: true) }
+                        NavigationLink(value: job.displayId) {
+                            JobRow(job: job, displayLabel: job.displayLabel(mac: macForDisplay(job.displayId)))
+                        }
                     } else {
-                        JobRow(job: job, showsDisplay: false)
+                        JobRow(job: job)
                     }
                 }
             }
@@ -91,7 +97,8 @@ struct JobsView: View {
 /// Zeile eines Auftrags: Art, Status, ggf. Display, Fehlertext, Zeitpunkt bzw. nächster Versuch.
 struct JobRow: View {
     let job: Job
-    var showsDisplay = false
+    /// Angezeigter Displayname (nur in der globalen Liste).
+    var displayLabel: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -102,8 +109,8 @@ struct JobRow: View {
                     .font(.caption)
                     .foregroundStyle(job.status.isFailure ? Color.red : job.status.isOpen ? Color.blue : Color.secondary)
             }
-            if showsDisplay, let name = job.displayName, !name.isEmpty {
-                Text(name).font(.caption).foregroundStyle(.secondary)
+            if let displayLabel {
+                Text(displayLabel).font(.caption).foregroundStyle(.secondary)
             }
             if let text = job.errorText, job.status.isFailure || job.status == .retry {
                 Text(text).font(.caption).foregroundStyle(job.status.isFailure ? Color.red : Color.orange)
